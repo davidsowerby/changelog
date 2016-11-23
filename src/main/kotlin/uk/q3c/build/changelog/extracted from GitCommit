@@ -1,0 +1,16 @@
+    /**
+     * Looks for any occurrence of an exclusion tag in [fullMessage], and returns true if it finds one, otherwise returns false
+
+     * @param changeLogConfiguration the configuration for the change log, which defines the exclusion tags and the opening and closing tag markers
+     * *
+     * @return true if an exclusion tag is found
+     */
+    fun excludedFromChangeLog(changeLogConfiguration: ChangeLogConfiguration): Boolean {
+        for (exclusionTag in changeLogConfiguration.exclusionTags) {
+            val fullTag = changeLogConfiguration.exclusionTagOpen + exclusionTag + changeLogConfiguration.exclusionTagClose
+            if (fullMessage.contains(fullTag)) {
+                return true
+            }
+        }
+        return false
+    }
