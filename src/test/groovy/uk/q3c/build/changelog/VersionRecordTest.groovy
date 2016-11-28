@@ -27,12 +27,12 @@ import static org.assertj.core.api.Assertions.assertThat
  * Created by David Sowerby on 09 Mar 2016
  */
 class VersionRecordTest extends Specification {
-    VersionRecord record;
+    VersionRecord record
     GitCommit rc1
     PersonIdent personIdent = Mock(PersonIdent)
     GitRemote gitRemote = Mock(GitRemote)
     @Shared
-    MockGitRemote mockRemote = new MockGitRemote()
+    MockGitRemote mockRemote
     GitPlus gitPlus = Mock(GitPlus)
     MockGitLocal gitLocal = new MockGitLocal()
     DefaultChangeLogConfiguration changeLogConfiguration
@@ -40,6 +40,8 @@ class VersionRecordTest extends Specification {
     ZonedDateTime releaseDate = ZonedDateTime.of(LocalDateTime.of(2015, 1, 11, 12, 12), ZoneId.of("Z"))
 
     def setup() {
+        mockRemote = new MockGitRemote()
+        mockRemote.createIssues(0)
         changeLogConfiguration = new DefaultChangeLogConfiguration()
         gitPlus.remote >> gitRemote
         rc1 = gitLocal.commits1.get(0)
@@ -99,7 +101,7 @@ class VersionRecordTest extends Specification {
         gitRemote.isIssueFixWord('Fix') >> true
 
         when:
-        record.parse(gitRemote)
+        record.parse()
         Map<String, Set<GPIssue>> fixes = record.getFixesByGroup()
 
         then:
@@ -123,9 +125,9 @@ class VersionRecordTest extends Specification {
         gitRemote.isIssueFixWord('Fix') >> true
 
         when:
-        record.parse(gitRemote)
+        record.parse()
         Map<String, Set<GPIssue>> fixes = record.getFixesByGroup()
-        Set<GPIssue> pullRequests = record.getPullRequests();
+        Set<GPIssue> pullRequests = record.getPullRequests()
 
         then:
         1 * gitRemote.getIssue(1) >> issue1
@@ -160,15 +162,16 @@ class VersionRecordTest extends Specification {
         given:
         final String tagName = "0.1"
         Tag tag = newTag(tagName)
+        changeLogConfiguration.exclusionTags(ImmutableSet.of("javadoc"))
         record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
         addCommitsOneWithExclusionTag(record)
 
         when:
-        record.parse(gitRemote)
+        record.parse()
 
         then:
         record.getCommits().size() == 1
-        record.getCommits().get(0).getFullMessage().equals('Fix #1 widget properly fixed')
+        record.getCommits().get(0).getFullMessage().equals(gitLocal.commits1.get(0).fullMessage)
         record.getExcludedCommits().size() == 1
 
 
@@ -184,11 +187,12 @@ class VersionRecordTest extends Specification {
         gitPlus2.remote >> mockRemote
         gitPlus2.local >> gitLocal
         Tag tag = newTag("0.1")
+        changeLogConfiguration.correctTypos(true)
         record = new VersionRecord(tag, changeLogConfiguration, gitPlus2)
         record.addCommit(gitLocal.commits1.get(commitNo))
 
         when:
-        List<GPIssue> fixReferences = record.parse(mockRemote)
+        List<GPIssue> fixReferences = record.parse()
 
         then:
         fixReferences.size() == issueNo.size()
@@ -218,7 +222,7 @@ class VersionRecordTest extends Specification {
         versionRecord.addCommit(commit2)
     }
 
-    def Tag newTag(String tagName) {
+    Tag newTag(String tagName) {
         return new Tag(tagName, releaseDate, commitDate, personIdent, "version " + tagName, rc1, Tag.TagType.ANNOTATED)
     }
 
@@ -229,7 +233,7 @@ class VersionRecordTest extends Specification {
                 msg = msg + '\n\n Fix #5 commit detail'
             }
             String hash = DigestUtils.sha1Hex(Integer.toString(i))
-            GitCommit commit = new GitCommit(msg, hash, personIdent, personIdent);
+            GitCommit commit = new GitCommit(msg, hash, personIdent, personIdent)
             record.addCommit(commit)
         }
     }

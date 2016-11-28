@@ -13,8 +13,8 @@ import java.io.File
  */
 
 class DefaultChangeLogConfiguration : ChangeLogConfiguration {
-
-
+    override var projectName: String = notSpecified
+    override var remoteRepoUser: String = notSpecified
     override var templateName = DEFAULT_TEMPLATE
     override var labelGroups: Map<String, Set<String>> = defaultLabelGroups
     override var separatePullRequests = true
@@ -35,22 +35,33 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
     override var maxCommits: Int = 1000
     override var maxVersions: Int = 50
     override var processingAsVersions: Boolean = true
+    override var versionTagFilter: VersionTagFilter = AllTagsAreVersionsTagFilter()
+    override var showDetail = true
+    override lateinit var projectDirParent: File
 
-    override fun processAsVersions() {
+
+    override fun processAsVersions(): ChangeLogConfiguration {
         processingAsVersions = true
+        return this
     }
 
-    override fun processAsCommits() {
+    override fun processAsCommits(): ChangeLogConfiguration {
         processingAsVersions = false
+        return this
     }
 
 
     override fun validate() {
-        val processingVersions = (maxVersions > 0) || (toVersionId != notSpecified) || (fromVersionId != notSpecified)
-        val processingCommits = (maxCommits > 0) || (toCommitId != notSpecified) || (fromCommitId != notSpecified)
-        if (processingVersions && processingCommits) {
-            throw ChangeLogConfigurationException("Configuration settings imply processing by both versions and commits.  Please select only one or the other")
+        if (maxVersions <= 0 && maxCommits <= 0) {
+            throw ChangeLogConfigurationException("Both maxCommits and maxVersions are <=0.  No output would be produced")
         }
+        if (projectName == notSpecified) {
+            throw ChangeLogConfigurationException("projectName must be specified")
+        }
+        if (remoteRepoUser == notSpecified) {
+            throw ChangeLogConfigurationException("remoteRepoUser must be specified")
+        }
+
     }
 
     override fun autoTagLatestCommit(value: Boolean): ChangeLogConfiguration {
@@ -60,13 +71,11 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
 
     override fun fromCommitId(commitId: String): ChangeLogConfiguration {
         this.fromCommitId = commitId
-        processAsCommits()
         return this
     }
 
     override fun toCommitId(commitId: String): ChangeLogConfiguration {
         this.toCommitId = commitId
-        processAsCommits()
         return this
     }
 
@@ -119,6 +128,11 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
         return this
     }
 
+    override fun exclusionTags(vararg tag: String): ChangeLogConfiguration {
+        this.exclusionTags = ImmutableSet.copyOf(tag)
+        return this
+    }
+
 
     override fun typoMap(typoMap: Map<String, String>): ChangeLogConfiguration {
         this.typoMap = typoMap
@@ -147,17 +161,33 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
 
     override fun maxCommits(numberOfCommits: Int): ChangeLogConfiguration {
         this.maxCommits = numberOfCommits
-        processAsCommits()
         return this
     }
 
-//    override fun isStartOfRange(commitId: String): Boolean {
-//        TODO()
-//    }
-//
-//    override fun isEndOfRange(commitId: String): Boolean {
-//        TODO()
-//    }
+    override fun versionTagFilter(versionTagFilter: VersionTagFilter): ChangeLogConfiguration {
+        this.versionTagFilter = versionTagFilter
+        return this
+    }
+
+    override fun showDetail(value: Boolean): ChangeLogConfiguration {
+        this.showDetail = value
+        return this
+    }
+
+    override fun remoteRepoUser(remoteRepoUser: String): ChangeLogConfiguration {
+        this.remoteRepoUser = remoteRepoUser
+        return this
+    }
+
+    override fun projectName(projectName: String): ChangeLogConfiguration {
+        this.projectName = projectName
+        return this
+    }
+
+    override fun projectDirParent(projectDirParent: File): ChangeLogConfiguration {
+        this.projectDirParent = projectDirParent
+        return this
+    }
 
     companion object {
 

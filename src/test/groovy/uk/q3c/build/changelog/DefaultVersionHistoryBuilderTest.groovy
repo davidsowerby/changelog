@@ -22,7 +22,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
         gitLocal = new MockGitLocal()
         gitPlus.local >> gitLocal
         gitPlus.remote >> gitRemote
-        builder = new DefaultVersionHistoryBuilder(versionTagFilter)
+        builder = new DefaultVersionHistoryBuilder()
     }
 
     def "maxVersions set, no versions exist, throw exception"() {
@@ -140,13 +140,13 @@ class DefaultVersionHistoryBuilderTest extends Specification {
         gitLocal.createVersionTag('0.0.3', 2, 'any')
         gitLocal.createVersionTag('0.0.2', 7, 'any')
         gitLocal.createVersionTag('0.0.1', 8, 'any')
-        changeLogConfiguration.maxCommits(5)
+        changeLogConfiguration.maxCommits(5).processAsCommits()
 
         when:
         List<VersionRecord> versions = builder.build(gitPlus, changeLogConfiguration)
 
         then:
-        !changeLogConfiguration.processAsVersions()
+        !changeLogConfiguration.processingAsVersions
         builder.commitsProcessed == 5
         versions.size() == 2
     }
@@ -204,7 +204,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
 
     def "fromCommit into CurrentBuildTag"() {
         given:
-        changeLogConfiguration.fromCommitId(gitLocal.commits1.get(4).hash)
+        changeLogConfiguration.fromCommitId(gitLocal.commits1.get(4).hash).processAsCommits()
 
         when:
         List<VersionRecord> versions = builder.build(gitPlus, changeLogConfiguration)
@@ -217,7 +217,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
 
     def "fromCommit and toCommit set, both inclusive"() {
         given:
-        changeLogConfiguration.fromCommitId(gitLocal.commits1.get(4).hash).toCommitId(gitLocal.commits1.get(3).hash)
+        changeLogConfiguration.fromCommitId(gitLocal.commits1.get(4).hash).toCommitId(gitLocal.commits1.get(3).hash).processAsCommits()
 
         when:
         List<VersionRecord> versions = builder.build(gitPlus, changeLogConfiguration)
@@ -248,7 +248,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
         gitLocal.createVersionTag('0.0.3', 2, 'any')
         gitLocal.createVersionTag('0.0.2', 7, 'any')
         gitLocal.createVersionTag('0.0.1', 8, 'any')
-        changeLogConfiguration.toCommitId('rubbish')
+        changeLogConfiguration.toCommitId('rubbish').processAsCommits()
 
         when:
         List<VersionRecord> versions = builder.build(gitPlus, changeLogConfiguration)

@@ -1,10 +1,16 @@
 package uk.q3c.build.changelog
 
 import org.apache.commons.codec.digest.DigestUtils
+import org.apache.commons.io.FileUtils
+import org.junit.Rule
+import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
-import uk.q3c.build.gitplus.local.GitLocal
-import uk.q3c.build.gitplus.remote.GitRemote
+import uk.q3c.util.testutil.FileTestUtil
+
+import java.nio.file.Paths
+
+import static uk.q3c.build.changelog.OutputTarget.PROJECT_ROOT
 
 /**
  * Tests for correct extraction of Git commit comments, and any issue references within them
@@ -13,24 +19,82 @@ import uk.q3c.build.gitplus.remote.GitRemote
  */
 class DefaultChangeLogTest2 extends Specification {
 
+    @Rule
+    TemporaryFolder temporaryFolder
     ChangeLog changeLog
     GitPlus gitPlus = Mock(GitPlus)
     ChangeLogConfiguration configuration
-    GitLocal gitLocal
-    GitRemote gitRemote
+    MockGitLocal gitLocal
+    MockGitRemote mockRemote = new MockGitRemote()
+    VersionHistoryBuilder historyBuilder
 
     def setup() {
         gitLocal = new MockGitLocal()
-        gitRemote = new MockGitRemote()
+        gitLocal.projectDirParent(temporaryFolder.getRoot())
         gitPlus.local >> gitLocal
-        gitPlus.remote = gitRemote
+        gitPlus.remote >> mockRemote
+        mockRemote.createIssues(1)
         configuration = new DefaultChangeLogConfiguration()
-        changeLog = new DefaultChangeLog(gitPlus, configuration)
+        historyBuilder = new DefaultVersionHistoryBuilder()
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        configuration.projectName = "dummy"
+        configuration.remoteRepoUser = "davidsowerby"
+    }
+
+    def "output generated from default settings (except target), latest commit version tagged"() {
+        given:
+        gitLocal.projectName("Dummy")
+        gitLocal.createVersionTag('2.0', 0, 'version 2.0')
+        gitLocal.createVersionTag('1.1.0.1', 1, 'version 1.1.0.1')
+        gitLocal.createVersionTag('0.0.5.1', 4, 'prep')
+        gitLocal.createVersionTag('0.0.4.1', 5, 'prep')
+        gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
+        gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
+        configuration.outputTarget(PROJECT_ROOT).correctTypos(true)
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        String expected = 'changelog.md'
+        File expectedResult = testResource(expected)
+
+        when:
+        changeLog.generate()
+
+        then:
+        !FileTestUtil.compare(changeLog.outputFile(), expectedResult).isPresent()
+    }
+
+    def "no typo correction, latest build not versioned, detail suppressed"() {
+        given:
+        gitLocal.projectName("Dummy")
+        gitLocal.createVersionTag('2.0', 1, 'version 2.0')
+        gitLocal.createVersionTag('1.1.0.1', 2, 'version 1.1.0.1')
+        gitLocal.createVersionTag('0.0.5.1', 4, 'prep')
+        gitLocal.createVersionTag('0.0.4.1', 5, 'prep')
+        gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
+        gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
+        configuration.outputTarget(PROJECT_ROOT).correctTypos(false).showDetail(false)
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        String expected = 'changelog2.md'
+        File expectedResult = testResource(expected)
+
+        when:
+        changeLog.generate()
+
+        then:
+        !FileTestUtil.compare(changeLog.outputFile(), expectedResult, 4).isPresent() //cannot compare line 4, date changes
+        FileUtils.readLines(changeLog.outputFile()).get(4).startsWith('# [current build](https://github.com/davidsowerby/dummy/tree/current build)')
     }
 
 
     private String hash(int key) {
         return DigestUtils.sha1Hex(Integer.toString(key))
     }
+
+    private File testResource(String fileName) {
+        URL url = this.getClass()
+                .getResource(fileName)
+        return Paths.get(url.toURI())
+                .toFile()
+    }
+
 
 }

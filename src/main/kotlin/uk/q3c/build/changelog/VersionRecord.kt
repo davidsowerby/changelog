@@ -22,6 +22,8 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
     val fixesByGroup: MutableMap<String, MutableSet<GPIssue>>
     val labelLookup: Map<String, String>
     val pullRequests: MutableSet<GPIssue>
+    val expandedCommits: MutableList<ExpandedGitCommit> = mutableListOf()
+
 
     init {
         labelLookup = createLabelLookup(changeLogConfiguration.labelGroups)
@@ -97,14 +99,16 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
     /**
      * Expands commit and issue information to make it ready for output to Velocity
 
-     * @param gitRemote the service hosting issues etc (for example GitHub)   name
      * @return the issues referenced by all the commit comments
      */
     fun parse(): List<GPIssue> {
         val fixReferences: MutableList<GPIssue> = mutableListOf()
+        expandedCommits.clear()
         for (c in commits) {
             if (!excludedFromChangeLog(c, changeLogConfiguration)) {
-                extractIssueReferences(c, fixReferences)
+                val expandedCommitMessage = extractIssueReferences(c, fixReferences)
+                val expandedCommit = ExpandedGitCommit(c, expandedCommitMessage, extractShortMessage(expandedCommitMessage))
+                expandedCommits.add(expandedCommit)
                 for (issue in fixReferences) {
                     if (issue.isPullRequest) {
                         pullRequests.add(issue)
@@ -119,8 +123,12 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         return fixReferences
     }
 
+    private fun extractShortMessage(fullMessage: String): String {
+        return fullMessage.split("\n").get(0)
+    }
+
     /**
-     * Looks for any occurrence of an exclusion tag in [fullMessage], and returns true if it finds one, otherwise returns false
+     * Looks for any occurrence of an exclusion tag in a commit comment, and returns true if it finds one, otherwise returns false
 
      * @param changeLogConfiguration the configuration for the change log, which defines the exclusion tags
      * *
@@ -135,9 +143,8 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         return false
     }
 
-    fun extractIssueReferences(commit: GitCommit, fixReferences: MutableList<GPIssue>) {
+    fun extractIssueReferences(commit: GitCommit, fixReferences: MutableList<GPIssue>): String {
         var fullMessage = correctCommonTypos(commit.fullMessage)
-        val shortMessage = extractShortMessage(fullMessage)
 
         val tokenizer = StrTokenizer(fullMessage, StrMatcher.charSetMatcher(TOKEN_SPLIT_CHARS))
         val tokens = tokenizer.tokenList
@@ -147,7 +154,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         for (token in tokens) {
             previousToken = currentToken
             currentToken = token
-            val expandedReference = expandIssueReferences(previousToken, currentToken, gitPlus.remote, fixReferences)
+            val expandedReference = expandIssueReferences(previousToken, currentToken, fixReferences)
             expandedTokens.add(expandedReference)
         }
         val tokensIterator = tokens.iterator()
@@ -160,9 +167,10 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
                 fullMessage = fullMessage.replaceFirst(token.toRegex(), expandedToken)
             }
         }
+        return fullMessage
     }
 
-    private fun expandIssueReferences(previousToken: String, currentToken: String, gitRemote: GitRemote, fixReferences: MutableList<GPIssue>): String {
+    private fun expandIssueReferences(previousToken: String, currentToken: String, fixReferences: MutableList<GPIssue>): String {
         if (!currentToken.contains("#") || currentToken.length < 2) {
             return currentToken
         }
@@ -199,7 +207,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
             if (fullRepoName.isEmpty()) {
                 gpIssue = gitPlus.remote.getIssue(issueNumber)
             } else {
-                val splitRepoName = fullRepoName.split("/".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                val splitRepoName = fullRepoName.split("/".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
                 gpIssue = gitPlus.remote.getIssue(splitRepoName[0], splitRepoName[1], issueNumber)
             }
 
@@ -220,27 +228,28 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
 
     //TODO this depends on fix references, should be referenced back to GitRemote
     private fun correctCommonTypos(originalFullMessage: String): String {
-        return originalFullMessage.replace("Fix#", "Fix #")
-                .replace("fix#", "fix #")
-                .replace("Fixes#", "Fixes #")
-                .replace("fixes#", "fixes #")
-                .replace("See#", "See #")
-                .replace("see#", "see #")
+        if (changeLogConfiguration.correctTypos) {
+            return originalFullMessage.replace("Fix#", "Fix #")
+                    .replace("fix#", "fix #")
+                    .replace("Fixes#", "Fixes #")
+                    .replace("fixes#", "fixes #")
+                    .replace("See#", "See #")
+                    .replace("see#", "see #")
 
-                .replace("Close#", "Close #")
-                .replace("close#", "close #")
-                .replace("Closes#", "Closes #")
-                .replace("closes#", "closes #")
-                .replace("Resolve#", "Resolve #")
-                .replace("resolve#", "resolve #")
-                .replace("Resolves#", "Resolves #")
-                .replace("resolves#", "resolves #")
+                    .replace("Close#", "Close #")
+                    .replace("close#", "close #")
+                    .replace("Closes#", "Closes #")
+                    .replace("closes#", "closes #")
+                    .replace("Resolve#", "Resolve #")
+                    .replace("resolve#", "resolve #")
+                    .replace("Resolves#", "Resolves #")
+                    .replace("resolves#", "resolves #")
+        } else {
+            return originalFullMessage
+        }
 
     }
 
-    fun extractShortMessage(fullMessage: String): String {
-        return fullMessage.split("\n".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[0]
-    }
 
     /**
      * Using the labels on an issue, attach the issue to any group for which it has a label

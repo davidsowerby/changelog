@@ -26,8 +26,30 @@ import java.io.File
 interface ChangeLogConfiguration {
 
     //************************************************************************************************************
-    //  Properties - each also has a fluent setter
+    //  Properties - grouped into functional areas.  Each also has a fluent setter
     //************************************************************************************************************
+
+    // ===========================================================================================================
+    //  Project identification
+    // ===========================================================================================================
+
+    /**
+     * Identifies the local project name
+     * Combines with [remoteRepoUser] to form identity of remote repository, for example 'davidsowerby/krail'
+     */
+    var projectName: String
+
+    /**
+     * Combines with [projectName] to form identity of remote repository, for example 'davidsowerby/krail'
+     */
+    var remoteRepoUser: String
+
+
+    /**
+     * Used with [projectName] to identify the project directory
+     */
+    var projectDirParent: File
+
 
     // ===========================================================================================================
     // Version or commit range properties - see interface javadoc for order of priorities.
@@ -96,6 +118,12 @@ interface ChangeLogConfiguration {
      */
     var maxCommits: Int
 
+    /**
+     * Identifies which tags are versions tags.  Default is to treat all tags as version tags. To treat tags differently,
+     * provide your own implementation of [VersionTagFilter] and assign an instance to this property.
+     */
+    var versionTagFilter: VersionTagFilter
+
 
     // ===========================================================================================================
     // Output layout and presentation properties
@@ -128,6 +156,12 @@ interface ChangeLogConfiguration {
      */
     var labelGroups: Map<String, Set<String>>
 
+    /**
+     * When true, show the full commit message in a detail section.  Also requires that the Velocity template uses this
+     * property (the default template does)
+     */
+    var showDetail: Boolean
+
     // ===========================================================================================================
     // Output destination properties
     // ===========================================================================================================
@@ -150,7 +184,6 @@ interface ChangeLogConfiguration {
     // ===========================================================================================================
     // Commit comment control properties
     // ===========================================================================================================
-
 
     /**
      * An exclusionTag stops a commit message from being processed into the Change Log.  Any commit comment which
@@ -189,6 +222,8 @@ interface ChangeLogConfiguration {
 
     fun typoMap(typoMap: Map<String, String>): ChangeLogConfiguration
 
+    fun exclusionTags(vararg tag: String): ChangeLogConfiguration
+
     fun exclusionTags(exclusionTags: Set<String>): ChangeLogConfiguration
 
     fun separatePullRequests(separatePullRequests: Boolean): ChangeLogConfiguration
@@ -213,16 +248,25 @@ interface ChangeLogConfiguration {
 
     fun fromVersionId(versionId: String): ChangeLogConfiguration
 
+    fun showDetail(value: Boolean): ChangeLogConfiguration
+
     fun toVersionId(versionId: String): ChangeLogConfiguration
+
+    fun versionTagFilter(versionTagFilter: VersionTagFilter): ChangeLogConfiguration
+
+    fun remoteRepoUser(remoteRepoUser: String): ChangeLogConfiguration
+
+    fun projectName(projectName: String): ChangeLogConfiguration
     /**
-     * Sets [processingAsVersions] to true
+     * Sets [processingAsVersions] to true - but as that is the default, you will rarely need this
      */
-    fun processAsVersions()
+    fun processAsVersions(): ChangeLogConfiguration
 
     /**
      * Sets [processingAsVersions] to false
      */
-    fun processAsCommits()
+    fun processAsCommits(): ChangeLogConfiguration
+
 
     // ===========================================================================================================
     //    Other functions
@@ -236,6 +280,7 @@ interface ChangeLogConfiguration {
     fun validate()
 
 
+    fun projectDirParent(projectDirParent: File): ChangeLogConfiguration
 }
 
 /**

@@ -10,7 +10,7 @@ import uk.q3c.build.gitplus.local.Tag
 /**
  * Created by David Sowerby on 18 Nov 2016
  */
-class DefaultVersionHistoryBuilder @Inject constructor(val versionTagFilter: VersionTagFilter) : VersionHistoryBuilder {
+class DefaultVersionHistoryBuilder @Inject constructor() : VersionHistoryBuilder {
     private val log = LoggerFactory.getLogger(this.javaClass.name)
     // maps commit hash to tag
     val tagMap: MutableMap<String, Tag> = mutableMapOf()
@@ -23,7 +23,7 @@ class DefaultVersionHistoryBuilder @Inject constructor(val versionTagFilter: Ver
 
     private lateinit var commitIterator: UnmodifiableListIterator<GitCommit>
 
-    fun build(gitPlus: GitPlus, changeLogConfiguration: ChangeLogConfiguration): List<VersionRecord> {
+    override fun build(gitPlus: GitPlus, changeLogConfiguration: ChangeLogConfiguration): List<VersionRecord> {
         val commits = gitPlus.local.extractCommitsFor(changeLogConfiguration.branch)
         this.changeLogConfiguration = changeLogConfiguration
         this.gitPlus = gitPlus
@@ -198,6 +198,7 @@ class DefaultVersionHistoryBuilder @Inject constructor(val versionTagFilter: Ver
     }
 
     private fun isVersion(gCommit: GitCommit): Boolean {
+        val versionTagFilter = changeLogConfiguration.versionTagFilter
         val tag = tagMap.get(gCommit.hash)
         if (tag != null) {
             if (versionTagFilter.isVersionTag(tag)) {

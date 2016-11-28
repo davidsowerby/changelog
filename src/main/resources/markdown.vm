@@ -1,0 +1,43 @@
+#set( $H1 = "#" )
+#set ($H2 = "#" + $H1)
+#set ($H3 = "#" + $H2)
+#set ($H4 = "#" + $H3)
+#set ($DATE_FORMAT="YYYY-MM-dd")
+#*@formatter:off*#
+$H1 Change Log for $projectName
+
+#foreach ($versionRecord in $versionRecords)
+
+$H1 [$versionRecord.tagName]($tagUrl$versionRecord.tagName) ($dateTool.format($DATE_FORMAT,$versionRecord.releaseDateAsDate))
+
+$H2 Summary
+
+#foreach ($expandedCommit in $versionRecord.expandedCommits)
+- $expandedCommit.expandedShortMessage
+#end
+
+
+$H2 Issues closed
+#if ($versionRecord.fixesByGroup.size() == 0)   None#end
+#foreach ($fixEntry in $versionRecord.fixesByGroup.entrySet())
+
+$H3 $fixEntry.key
+#foreach($issue in $fixEntry.value)
+- [$issue.number]($issue.htmlUrl) $issue.title
+#end ## end issues list
+
+#end## end issues block
+
+
+#if ($configuration.showDetail)
+$H2 Detail
+#foreach ($expandedCommit in $versionRecord.expandedCommits)
+
+$expandedCommit.expandedMessage
+
+---
+#end
+---
+#end
+#end
+#*@formatter:on*#

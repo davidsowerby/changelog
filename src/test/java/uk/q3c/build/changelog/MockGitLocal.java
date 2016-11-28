@@ -24,7 +24,7 @@ import java.util.List;
  */
 @SuppressWarnings("HardcodedFileSeparator")
 public class MockGitLocal implements GitLocal {
-
+    private final GitLocalConfiguration configuration = new DefaultGitLocalConfiguration();
     List<GitCommit> commits1 = new ArrayList<>();
     List<Tag> tags = new ArrayList<>();
     ZonedDateTime commitDate = ZonedDateTime.of(LocalDateTime.of(2010, 11, 11, 12, 2), ZoneId.of("Z"));
@@ -36,7 +36,7 @@ public class MockGitLocal implements GitLocal {
     }
 
     private void createCommits() {
-        createCommit("Fix #1 widget properly fixed"); //0
+        createCommit("Fix #1 widget properly fixed. \nWith a long and detailed explanation of what\nwas done to fix it."); //0
         createCommit("Fix #2 widget really properly fixed\n\nAlso fix #3 and fix #4"); //1
         createCommit("Fix#5 Typo in fix reference, space missing");//2
         createCommit("Fix #99 Issue number does not exist");//3
@@ -276,7 +276,7 @@ public class MockGitLocal implements GitLocal {
     @NotNull
     @Override
     public String getProjectName() {
-        return null;
+        return configuration.getProjectName();
     }
 
     @Override
@@ -374,13 +374,14 @@ public class MockGitLocal implements GitLocal {
     @NotNull
     @Override
     public GitLocalConfiguration projectName(String s) {
-        return null;
+        return configuration.projectName(s);
     }
 
     @NotNull
     @Override
     public GitLocalConfiguration projectDirParent(File file) {
-        return null;
+        configuration.projectDirParent(file);
+        return this;
     }
 
     @NotNull
@@ -416,7 +417,7 @@ public class MockGitLocal implements GitLocal {
     @NotNull
     @Override
     public File projectDir() {
-        return null;
+        return new File(configuration.getProjectDirParent(), configuration.getProjectName());
     }
 
     @Override

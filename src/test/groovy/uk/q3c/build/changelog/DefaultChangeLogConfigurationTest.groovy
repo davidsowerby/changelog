@@ -10,10 +10,11 @@ import uk.q3c.build.gitplus.gitplus.DefaultGitPlus
 import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.GitLocal
 import uk.q3c.build.gitplus.local.WikiLocal
-import uk.q3c.build.gitplus.remote.GitRemote
 import uk.q3c.build.gitplus.remote.GitRemoteProvider
 import uk.q3c.build.gitplus.remote.ServiceProvider
 import uk.q3c.build.gitplus.remote.github.GitHubRemote
+
+import static uk.q3c.build.changelog.ConstantsKt.getNotSpecified
 
 /**
  * Created by David Sowerby on 13 Mar 2016
@@ -21,18 +22,19 @@ import uk.q3c.build.gitplus.remote.github.GitHubRemote
 class DefaultChangeLogConfigurationTest extends Specification {
 
 
-    DefaultChangeLogConfiguration config;
-    DefaultGitPlus gitPlus;
+    DefaultChangeLogConfiguration config
+    DefaultGitPlus gitPlus
     GitLocal gitLocal = Mock(GitLocal)
     WikiLocal wikiLocal = Mock(WikiLocal)
     GitHubRemote defaultRemote = Mock(GitHubRemote)
-    GitRemote mockRemote = new MockGitRemote()
     GitRemoteProvider remoteProvider = Mock(GitRemoteProvider)
     @Rule
-    TemporaryFolder temporaryFolder = new TemporaryFolder();
+    TemporaryFolder temporaryFolder = new TemporaryFolder()
 
     def setup() {
         config = new DefaultChangeLogConfiguration()
+        config.projectName = "dummy"
+        config.remoteRepoUser = "davidsowerby"
         remoteProvider.getDefault() >> defaultRemote
         remoteProvider.defaultProvider() >> ServiceProvider.GITHUB
         defaultRemote.repoUser(_) >> defaultRemote
@@ -45,13 +47,14 @@ class DefaultChangeLogConfigurationTest extends Specification {
         expect:
 
         // Version or commit range properties - see interface javadoc for order of priorities.
-        config.fromVersionId == ConstantsKt.notSpecified
-        config.toVersionId == ConstantsKt.notSpecified
-        config.fromCommitId == ConstantsKt.notSpecified
-        config.toCommitId == ConstantsKt.notSpecified
+        config.fromVersionId == notSpecified
+        config.toVersionId == notSpecified
+        config.fromCommitId == notSpecified
+        config.toCommitId == notSpecified
         config.branch == new GitBranch("develop")
-        config.lastNVersions == -1
-        config.lastNCommits == -1
+        config.maxVersions == 50
+        config.maxCommits == 1000
+        config.autoTagLatestCommit
 
         // Output layout and presentation properties
         config.separatePullRequests
@@ -68,6 +71,9 @@ class DefaultChangeLogConfigurationTest extends Specification {
         !config.correctTypos
 
         config.exclusionTags.isEmpty()
+
+        config.versionTagFilter instanceof AllTagsAreVersionsTagFilter
+
     }
 
     def "defaults with late init"() {
@@ -95,6 +101,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         String pullRequestTitle = "rrrrrrrrr"
         String templateName = "tname"
         Map<String, Set<String>> labelGroups = ImmutableMap.of()
+        VersionTagFilter tagFilter = Mock(VersionTagFilter)
 
         when:
         config
@@ -115,6 +122,8 @@ class DefaultChangeLogConfigurationTest extends Specification {
                 .exclusionTags(exclusionTags)
                 .typoMap(typoMap)
                 .correctTypos(true)
+                .versionTagFilter(tagFilter)
+                .autoTagLatestCommit(false)
 
         then:
         // Version or commit range properties - see interface javadoc for order of priorities.
@@ -123,8 +132,8 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.fromCommitId == fromCommit
         config.toCommitId == toCommit
         config.branch == branch
-        config.lastNVersions == nVersions
-        config.lastNCommits == nCommits
+        config.maxVersions == nVersions
+        config.maxCommits == nCommits
         !config.separatePullRequests
         config.pullRequestTitle == pullRequestTitle
         config.templateName == templateName
@@ -134,9 +143,99 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.outputFileSpec == outputFileSpec
         config.typoMap == typoMap
         config.correctTypos
-
+        config.versionTagFilter == tagFilter
+        !config.autoTagLatestCommit
         config.exclusionTags == exclusionTags
     }
 
+    def "versions or commits"() {
+        when:
+        true //do nothing
 
+        then: "default"
+        config.processingAsVersions
+
+        when:
+        config.processAsCommits()
+
+        then:
+        !config.processingAsVersions
+
+        when:
+        config.processAsVersions()
+
+        then:
+        config.processingAsVersions
+
+    }
+
+    def "validate with maxVersions and maxCommits <=0 throw exception"() {
+        given:
+        config.maxCommits(0).maxVersions(0)
+
+        when:
+        config.validate()
+
+        then:
+        thrown ChangeLogConfigurationException
+
+        when:
+        config.maxCommits(1).maxVersions(0)
+        config.validate()
+
+        then:
+        noExceptionThrown()
+
+        when:
+        config.maxCommits(0).maxVersions(1)
+        config.validate()
+
+        then:
+        noExceptionThrown()
+    }
+
+    def "validate with missing projectName or remoteRepoUser throws Exception"() {
+        when:
+        config.projectName = notSpecified
+        config.validate()
+
+        then:
+        thrown ChangeLogConfigurationException
+
+        when:
+        config.projectName = "dummy"
+        config.remoteRepoUser = notSpecified
+        config.validate()
+
+        then:
+        thrown ChangeLogConfigurationException
+
+        when:
+        config.remoteRepoUser = "davidsowerby"
+        config.validate()
+
+        then:
+        noExceptionThrown()
+
+    }
+
+    def "set exclusion tags"() {
+        when:
+        true
+
+        then: "default"
+        config.exclusionTags.isEmpty()
+
+        when:
+        config.exclusionTags(ImmutableSet.of("wiggly"))
+
+        then:
+        config.exclusionTags == ImmutableSet.of("wiggly")
+
+        when:
+        config.exclusionTags("a", "b")
+
+        then:
+        config.exclusionTags == ImmutableSet.of("a", "b")
+    }
 }
