@@ -34,7 +34,7 @@ class DefaultChangeLogTest3 extends Specification {
         then:
         outputFile.exists()
         Status status = changeLog.gitPlus().local.status()
-        Date.getMillisOf(new Date()) - outputFile.lastModified() < 1000
+        status.clean
 
     }
 }
