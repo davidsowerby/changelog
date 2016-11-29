@@ -16,14 +16,15 @@ class CurrentBuildTagTest extends Specification {
         given:
         ZonedDateTime now = ZonedDateTime.now()
         PersonIdent committer = Mock(PersonIdent)
-        committer.when >> Date.from(now.toInstant());
+        committer.when >> Date.from(now.toInstant())
         committer.timeZone >> TimeZone.default
         GitCommit commit = new GitCommit("commit message", "xx", committer, committer)
         commit.getCommitter() >> committer
         commit.getCommitDate() >> now
+        String tagName = "anything"
 
         when:
-        CurrentBuildTag tag = new CurrentBuildTag(commit)
+        CurrentBuildTag tag = new CurrentBuildTag(commit, "anything")
 
         then:
         tag.getReleaseDate().equals(now)
@@ -31,5 +32,6 @@ class CurrentBuildTagTest extends Specification {
         tag.getFullMessage().equals('Pseudo tag on latest commit')
         tag.getTaggerIdent().equals(committer)
         tag.getTagType() == Tag.TagType.PSEUDO
+        tag.getTagName() == tagName
     }
 }

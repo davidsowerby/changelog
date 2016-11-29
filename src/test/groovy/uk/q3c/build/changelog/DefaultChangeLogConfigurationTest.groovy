@@ -73,6 +73,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.exclusionTags.isEmpty()
 
         config.versionTagFilter instanceof AllTagsAreVersionsTagFilter
+        config.currentBuildTagName == "current build"
 
     }
 
@@ -102,6 +103,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         String templateName = "tname"
         Map<String, Set<String>> labelGroups = ImmutableMap.of()
         VersionTagFilter tagFilter = Mock(VersionTagFilter)
+        String currentBuildTag = 'unreleased'
 
         when:
         config
@@ -124,6 +126,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
                 .correctTypos(true)
                 .versionTagFilter(tagFilter)
                 .autoTagLatestCommit(false)
+                .currentBuildTagName(currentBuildTag)
 
         then:
         // Version or commit range properties - see interface javadoc for order of priorities.
@@ -146,6 +149,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.versionTagFilter == tagFilter
         !config.autoTagLatestCommit
         config.exclusionTags == exclusionTags
+        config.currentBuildTagName == currentBuildTag
     }
 
     def "versions or commits"() {

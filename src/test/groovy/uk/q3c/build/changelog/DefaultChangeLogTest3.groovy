@@ -1,6 +1,7 @@
 package uk.q3c.build.changelog
 
 import com.google.inject.Inject
+import org.junit.Ignore
 import spock.guice.UseModules
 import spock.lang.Specification
 
@@ -25,6 +26,23 @@ class DefaultChangeLogTest3 extends Specification {
         File wikiDir = new File(gitHome, 'changelog.wiki')
         File outputFile = new File(wikiDir, filename)
         changeLog.outputFilename(filename).outputTarget(OutputTarget.WIKI_ROOT)
+        changeLog.projectName('changelog').remoteRepoUser('davidsowerby').projectDirParent(gitHome)
+
+        when:
+        changeLog.generate()
+
+        then:
+        outputFile.exists()
+    }
+
+    @Ignore
+    def "generate log for this project"() {
+        given:
+        File userHome = new File(System.getProperty('user.home'))
+        File gitHome = new File(userHome, 'git')
+        String filename = 'changelog.md'
+        File wikiDir = new File(gitHome, 'changelog.wiki')
+        File outputFile = new File(wikiDir, filename)
         changeLog.projectName('changelog').remoteRepoUser('davidsowerby').projectDirParent(gitHome)
 
         when:

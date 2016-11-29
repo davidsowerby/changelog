@@ -79,6 +79,7 @@ Used only when [processingAsVersions] is false
 
 | name                  | purpose                                                                              | default                   |
 |-----------------------|--------------------------------------------------------------------------------------|---------------------------|
+| currentBuildTagName   | Tag name to use when most recent commit is pseudo-tagged, (see [autoTagLatestCommit])| "current build            |
 | labelGroups           | A mapping of label groups to labels                                                  | see property detail below |
 | pullRequestTitle      | The title to use for the change log section containing pull requests                 | "Pull Requests"           |
 | separatePullRequests  | If true, list PRs under their own heading, otherwise just list with other issues     | true                      |

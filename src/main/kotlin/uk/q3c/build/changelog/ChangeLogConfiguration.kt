@@ -4,22 +4,9 @@ import uk.q3c.build.gitplus.local.GitBranch
 import java.io.File
 
 /**
- * Configures a [ChangeLog] output.  The range of output is defined in terms of either version or commits - only one or
- * the other can be used for a generation run
+ * Configures a [ChangeLog] output.
  *
- * A version is defined by Git tags - tags can be filtered by instances of [VersionTagFilter] to ensure that
- * only relevant tags are identified as versions, see [fromVersionId] and [toVersionId]
- *
- * Output range can be expressed as commit ids, see [fromCommitId] and [toCommitId].
- *
- * The maximum output can be limited by [maxVersions] and [maxCommits] respectively
- *
- * Support for producing output for only the most recent versions or commits is provided by [maxVersions] and [maxCommits]
- * respectively
- *
- * If the default range settings are used, the most recent versions will be produced, up to a maximum of 50
- *
- *
+ * See [user documentation](http://ds-changelog.readthedocs.io/en/develop/) for detail
  *
  * Created by David Sowerby on 12 Nov 2016
  */
@@ -33,10 +20,6 @@ interface ChangeLogConfiguration {
     //  Project identification
     // ===========================================================================================================
 
-    /**
-     * Identifies the local project name
-     * Combines with [remoteRepoUser] to form identity of remote repository, for example 'davidsowerby/krail'
-     */
     var projectName: String
 
     /**
@@ -52,10 +35,8 @@ interface ChangeLogConfiguration {
 
 
     // ===========================================================================================================
-    // Version or commit range properties - see interface javadoc for order of priorities.
-    // Unused settings are simply left as 'unspecified'
+    // Version or commit range properties
     // ===========================================================================================================
-
 
     /**
      * If true, tags are evaluated as versions (using [versionTagFilter]) and the output collated into versions.
@@ -128,6 +109,12 @@ interface ChangeLogConfiguration {
     // ===========================================================================================================
     // Output layout and presentation properties
     // ===========================================================================================================
+
+    /**
+     * When the most recent build is not tagged, a "pseudo tag" is added (if [autoTagLatestCommit] is true).  The name of this tag
+     * is defeind by this property
+     */
+    var currentBuildTagName: String
 
     /**
      * If true, pull requests are extracted under their own heading in the change log.  If false, they are merged with other issues according to the labels
@@ -257,6 +244,10 @@ interface ChangeLogConfiguration {
     fun remoteRepoUser(remoteRepoUser: String): ChangeLogConfiguration
 
     fun projectName(projectName: String): ChangeLogConfiguration
+
+    fun projectDirParent(projectDirParent: File): ChangeLogConfiguration
+
+    fun currentBuildTagName(tagName: String)
     /**
      * Sets [processingAsVersions] to true - but as that is the default, you will rarely need this
      */
@@ -280,7 +271,6 @@ interface ChangeLogConfiguration {
     fun validate()
 
 
-    fun projectDirParent(projectDirParent: File): ChangeLogConfiguration
 }
 
 /**

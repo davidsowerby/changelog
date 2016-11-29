@@ -38,6 +38,7 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
     override var versionTagFilter: VersionTagFilter = AllTagsAreVersionsTagFilter()
     override var showDetail = true
     override lateinit var projectDirParent: File
+    override var currentBuildTagName = "current build"
 
 
     override fun processAsVersions(): ChangeLogConfiguration {
@@ -157,6 +158,10 @@ class DefaultChangeLogConfiguration : ChangeLogConfiguration {
     override fun maxVersions(numberOfVersions: Int): ChangeLogConfiguration {
         this.maxVersions = numberOfVersions
         return this
+    }
+
+    override fun currentBuildTagName(tagName: String) {
+        this.currentBuildTagName = tagName
     }
 
     override fun maxCommits(numberOfCommits: Int): ChangeLogConfiguration {

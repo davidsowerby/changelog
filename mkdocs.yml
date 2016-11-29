@@ -1,4 +1,4 @@
-site_name: ChangeLog
+site_name: ds-changelog
 
 pages:
 - Home: 'index.md'

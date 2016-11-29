@@ -55,7 +55,7 @@ class DefaultVersionHistoryBuilder @Inject constructor() : VersionHistoryBuilder
     private fun verifyCurrentBuildTag(latestCommit: GitCommit, changeLogConfiguration: ChangeLogConfiguration) {
         if (changeLogConfiguration.autoTagLatestCommit) {
             if (!tagMap.containsKey(latestCommit.hash)) {
-                tagMap.put(latestCommit.hash, CurrentBuildTag(latestCommit))
+                tagMap.put(latestCommit.hash, CurrentBuildTag(latestCommit, changeLogConfiguration.currentBuildTagName))
             }
         }
     }
