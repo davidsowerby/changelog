@@ -109,12 +109,12 @@ interface ChangeLogConfiguration {
     var branch: GitBranch
 
     /**
-     * Used only when [processingAsVersions] is true.  Limits the number of versions produced.  Default is 1000
+     * Used only when [processingAsVersions] is true.  Limits the number of versions produced.  Default is 50
      */
     var maxVersions: Int
 
     /**
-     * Used only when [processingAsVersions] is false.  Limits the number of commits processed.  Default is 0
+     * Used only when [processingAsVersions] is false.  Limits the number of commits processed.  Default is 1000
      */
     var maxCommits: Int
 
@@ -148,9 +148,9 @@ interface ChangeLogConfiguration {
 
     /**
      * A mapping of label groups to labels, so that issues bearing the same label are grouped together in the output
-     * Implementation should use a [LinkedHashMap] to retain insertion order - this therefore also determines the
-     * order of presentation.  Note that if an issues has multiple labels, it may appear in multiple places in the output,
-     * depending on how the labels are grouped.  Duplicates within a group are ignored.
+     * Implementation should retain insertion order - this map also determines the order of presentation.  If an issue
+     * has multiple labels, it may appear in multiple places in the output, depending on how the labels are grouped.
+     * Duplicates within a group are ignored.
      *
      * Default is [DefaultChangeLogConfiguration.defaultLabelGroups]
      */

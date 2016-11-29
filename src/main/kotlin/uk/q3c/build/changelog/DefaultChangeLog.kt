@@ -85,6 +85,7 @@ class DefaultChangeLog @Inject constructor(val gitPlus: GitPlus, val configurati
     private fun prepareGitPlus() {
         gitPlus.local.projectName = projectName
         gitPlus.remote.repoUser = remoteRepoUser
+        gitPlus.remote.repoName = projectName
         gitPlus.local.projectDirParent = projectDirParent
         gitPlus.local.prepare(gitPlus.remote)
         gitPlus.wikiLocal.prepare(gitPlus.remote, gitPlus.local)

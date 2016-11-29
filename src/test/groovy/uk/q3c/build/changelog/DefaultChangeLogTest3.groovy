@@ -1,7 +1,6 @@
 package uk.q3c.build.changelog
 
 import com.google.inject.Inject
-import org.eclipse.jgit.api.Status
 import spock.guice.UseModules
 import spock.lang.Specification
 
@@ -33,8 +32,5 @@ class DefaultChangeLogTest3 extends Specification {
 
         then:
         outputFile.exists()
-        Status status = changeLog.gitPlus().local.status()
-        status.clean
-
     }
 }

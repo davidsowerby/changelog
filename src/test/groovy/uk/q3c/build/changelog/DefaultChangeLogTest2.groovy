@@ -6,6 +6,7 @@ import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.WikiLocal
 import uk.q3c.util.testutil.FileTestUtil
 
 import java.nio.file.Paths
@@ -21,18 +22,22 @@ class DefaultChangeLogTest2 extends Specification {
 
     @Rule
     TemporaryFolder temporaryFolder
+    File temp
     ChangeLog changeLog
     GitPlus gitPlus = Mock(GitPlus)
     ChangeLogConfiguration configuration
     MockGitLocal gitLocal
+    WikiLocal wikiLocal = Mock(WikiLocal)
     MockGitRemote mockRemote = new MockGitRemote()
     VersionHistoryBuilder historyBuilder
 
     def setup() {
+        temp = temporaryFolder.getRoot()
         gitLocal = new MockGitLocal()
         gitLocal.projectDirParent(temporaryFolder.getRoot())
         gitPlus.local >> gitLocal
         gitPlus.remote >> mockRemote
+        gitPlus.wikiLocal >> wikiLocal
         mockRemote.createIssues(1)
         configuration = new DefaultChangeLogConfiguration()
         historyBuilder = new DefaultVersionHistoryBuilder()
@@ -50,7 +55,7 @@ class DefaultChangeLogTest2 extends Specification {
         gitLocal.createVersionTag('0.0.4.1', 5, 'prep')
         gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
         gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
-        configuration.outputTarget(PROJECT_ROOT).correctTypos(true)
+        configuration.outputTarget(PROJECT_ROOT).correctTypos(true).projectDirParent(temp)
         changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
         String expected = 'changelog.md'
         File expectedResult = testResource(expected)
@@ -71,7 +76,7 @@ class DefaultChangeLogTest2 extends Specification {
         gitLocal.createVersionTag('0.0.4.1', 5, 'prep')
         gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
         gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
-        configuration.outputTarget(PROJECT_ROOT).correctTypos(false).showDetail(false)
+        configuration.outputTarget(PROJECT_ROOT).correctTypos(false).showDetail(false).projectDirParent(temp)
         changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
         String expected = 'changelog2.md'
         File expectedResult = testResource(expected)
