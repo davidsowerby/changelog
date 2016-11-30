@@ -2,7 +2,7 @@
 
 ChangeLog uses Git commit comments and tags from a local repository, combined with issue information from an associated remote repository, to build a change log.
 
-parameters are highly configurable, and a [Velocity] template is used to generate the output, enabling the user to modify presentation however they wish.
+parameters are highly configurable, and a [Velocity](https://velocity.apache.org/) is used to generate the output, enabling the user to modify presentation however they wish.
  
 ## Alternatives
   
@@ -32,11 +32,18 @@ tbd - [open issue](https://github.com/davidsowerby/changelog/issues/6)
 
 A minimum configuration requires, a project name, the user name of the remote repo, and target project's parent directory:
 
-> changeLog.projectName('a-project-name').remoteRepoUser('remote-username').projectDirParent({parent directory of the target project})
+```
+changeLog
+   .projectName('a-project-name')
+   .remoteRepoUser('remote-username')
+   .projectDirParent({parent directory of the target project})
+```
 
 Once configured:
 
-> changelog.generate()
+```
+changelog.generate()
+```
 
 There are many [configuration options](configuration.md), but this minimal configuration will:
 
