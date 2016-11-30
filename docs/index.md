@@ -10,7 +10,7 @@ There are quite a few similar projects out there, and the preference would have 
 That project also provides a [useful list](https://github.com/skywinder/Github-Changelog-Generator/wiki/Alternatives) of similar projects.
 
 ## Limitations
-Currently only [GitHub](https://github.com) is supported as a source of issue information.  This limitation is actually caused by [GitPlus](https://github.com/davidsowerby/gitplus), which is used to manage the interaction with Git)
+Currently only [GitHub](https://github.com) is supported as a source of issue information.  This limitation is actually caused by [GitPlus](https://github.com/davidsowerby/gitplus), which is used to manage the interaction with Git) (Contributions of other implementations would be very welcome)
 
 ## Languages
 
@@ -26,7 +26,9 @@ Include a `ChangeLogModule` instance in your injector and inject `ChangeLog` whe
 
 ### Without Guice
 
-tbd - [open issue](https://github.com/davidsowerby/changelog/issues/6) 
+```
+ChangeLogFactory.getInstance()
+```
 
 ## Configuration
 

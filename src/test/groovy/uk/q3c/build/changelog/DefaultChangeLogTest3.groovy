@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import org.junit.Ignore
 import spock.guice.UseModules
 import spock.lang.Specification
+import uk.q3c.build.gitplus.gitplus.GitPlus
 
 /**
  *
@@ -33,6 +34,12 @@ class DefaultChangeLogTest3 extends Specification {
 
         then:
         outputFile.exists()
+    }
+
+    def "getGitPlus()"() {
+
+        expect:
+        changeLog.gitPlus() instanceof GitPlus
     }
 
     @Ignore
