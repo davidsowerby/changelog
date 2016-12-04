@@ -89,7 +89,7 @@ Used only when [processingAsVersions](#processingAsVersions) is false
 | pullRequestTitle      | The title to use for the change log section containing pull requests                 | "Pull Requests"           |
 | separatePullRequests  | If true, list PRs under their own heading, otherwise just list with other issues     | true                      |
 | showDetail            | When true, show the full commit message in a detail section.                         | true                      |
-| templateName          | The name of the Velocity template to use for change log layout                       | "markdown.vm"             |
+| <a name="templateName"></a>templateName          | The name of the Velocity template to use for change log layout                       | "markdown.vm"             |
     
 
 ### labelGroups

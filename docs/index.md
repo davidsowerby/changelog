@@ -30,9 +30,10 @@ Include a `ChangeLogModule` instance in your injector and inject `ChangeLog` whe
 ChangeLogFactory.getInstance()
 ```
 
-## Configuration
+<a name="MinimumConfiguration"></a>
+## Minimum Configuration
 
-A minimum configuration requires, a project name, the user name of the remote repo, and target project's parent directory:
+A minimum configuration requires a project name, the user name of the remote repo, and target project's parent directory:
 
 ```
 changeLog
@@ -41,13 +42,20 @@ changeLog
    .projectDirParent({parent directory of the target project})
 ```
 
+## API Keys
+An API key is needed to access issue information and potentially to push the change log output to the wiki.  An appropriate key should be located as described in the [GitPlus documentation](http://gitplus.readthedocs.io/en/develop/build-properties/)
+
+
+## Generating the output
+
 Once configured:
 
 ```
 changelog.generate()
 ```
 
-There are many [configuration options](configuration.md), but this minimal configuration will:
+
+There are many [configuration options](configuration.md), but this [minimum configuration](#MinimumConfiguration) will:
 
 - generate a change log based on tags (every tag is considered to be a version).
 - create a 'version' called 'current build' for any commits after the latest version (some refer to these as 'unreleased commits')
@@ -57,7 +65,7 @@ There are many [configuration options](configuration.md), but this minimal confi
 
 ## Sample Outputs
 
-The links below all use the standard Velocity template - you can of course change that and use your own template by changing the [templateName] property
+The links below all use the standard Velocity template - you can of course change that and use your own template by changing the [templateName](configuration/#templateName) property
 
 Projects
 --------
