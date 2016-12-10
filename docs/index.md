@@ -2,12 +2,13 @@
 
 ChangeLog uses Git commit comments and tags from a local repository, combined with issue information from an associated remote repository, to build a change log.
 
-parameters are highly configurable, and a [Velocity](https://velocity.apache.org/) is used to generate the output, enabling the user to modify presentation however they wish.
+Parameters are highly configurable, and [Velocity](https://velocity.apache.org/) is used to generate the output, enabling the user to modify presentation however they wish.
  
 ## Alternatives
   
-There are quite a few similar projects out there, and the preference would have been to use one that already exists.  None of them quite do what was wanted, although in functionality terms [this one](https://github.com/skywinder/Github-Changelog-Generator) looked very good.  Unfortunately, for our purposes it introduced a dependency on Ruby, for which we have no other purpose.
-That project also provides a [useful list](https://github.com/skywinder/Github-Changelog-Generator/wiki/Alternatives) of similar projects.
+There are quite a few similar projects out there, and the preference would have been to use one that already exists.  None of them quite do what was wanted, although in functionality terms [Github-Changelog-Generator](https://github.com/skywinder/Github-Changelog-Generator) looked very good.  Unfortunately, for our purposes it introduced a dependency on Ruby, for which we have no other purpose.
+
+**Github-Changelog-Generator** also provides a [useful list](https://github.com/skywinder/Github-Changelog-Generator/wiki/Alternatives) of similar projects.
 
 ## Limitations
 Currently only [GitHub](https://github.com) is supported as a source of issue information.  This limitation is actually caused by [GitPlus](https://github.com/davidsowerby/gitplus), which is used to manage the interaction with Git) (Contributions of other implementations would be very welcome)
