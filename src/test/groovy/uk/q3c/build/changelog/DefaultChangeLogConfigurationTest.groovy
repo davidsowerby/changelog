@@ -10,12 +10,9 @@ import uk.q3c.build.gitplus.gitplus.DefaultGitPlus
 import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.GitLocal
 import uk.q3c.build.gitplus.local.WikiLocal
-import uk.q3c.build.gitplus.remote.GitRemoteProvider
+import uk.q3c.build.gitplus.remote.GitRemoteResolver
 import uk.q3c.build.gitplus.remote.ServiceProvider
 import uk.q3c.build.gitplus.remote.github.GitHubRemote
-
-import static uk.q3c.build.changelog.ConstantsKt.getNotSpecified
-
 /**
  * Created by David Sowerby on 13 Mar 2016
  */
@@ -27,19 +24,20 @@ class DefaultChangeLogConfigurationTest extends Specification {
     GitLocal gitLocal = Mock(GitLocal)
     WikiLocal wikiLocal = Mock(WikiLocal)
     GitHubRemote defaultRemote = Mock(GitHubRemote)
-    GitRemoteProvider remoteProvider = Mock(GitRemoteProvider)
+    GitRemoteResolver remoteResolver = Mock(GitRemoteResolver)
     @Rule
     TemporaryFolder temporaryFolder = new TemporaryFolder()
+    String notSpecified = ConstantsKt.notSpecified
 
     def setup() {
         config = new DefaultChangeLogConfiguration()
         config.projectName = "dummy"
         config.remoteRepoUser = "davidsowerby"
-        remoteProvider.getDefault() >> defaultRemote
-        remoteProvider.defaultProvider() >> ServiceProvider.GITHUB
+        remoteResolver.getDefault() >> defaultRemote
+        remoteResolver.defaultProvider() >> ServiceProvider.GITHUB
         defaultRemote.repoUser(_) >> defaultRemote
         defaultRemote.repoName(_) >> defaultRemote
-        gitPlus = new DefaultGitPlus(gitLocal, wikiLocal, remoteProvider)
+        gitPlus = new DefaultGitPlus(gitLocal, wikiLocal, remoteResolver)
         gitPlus.remote.repoUser('davidsowerby').repoName('scratch')
     }
 

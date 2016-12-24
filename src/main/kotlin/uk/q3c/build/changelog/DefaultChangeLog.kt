@@ -87,8 +87,10 @@ class DefaultChangeLog @Inject constructor(val gitPlus: GitPlus, val configurati
         gitPlus.remote.repoUser = remoteRepoUser
         gitPlus.remote.repoName = projectName
         gitPlus.local.projectDirParent = projectDirParent
-        gitPlus.local.prepare(gitPlus.remote)
-        gitPlus.wikiLocal.prepare(gitPlus.remote, gitPlus.local)
+        if (outputTarget == OutputTarget.WIKI_ROOT) {
+            gitPlus.wikiLocal.active(true)
+        }
+        gitPlus.execute()
     }
 
 
@@ -110,10 +112,6 @@ class DefaultChangeLog @Inject constructor(val gitPlus: GitPlus, val configurati
         }
         return outputFile
     }
-
-
-
-
 
 
 }
