@@ -28,7 +28,7 @@ import java.io.StringWriter
  *
  * Created by David Sowerby on 07 Mar 2016
  */
-class DefaultChangeLog @Inject constructor(val gitPlus: GitPlus, val configuration: ChangeLogConfiguration, val versionHistoryBuilder: VersionHistoryBuilder) : ChangeLog, ChangeLogConfiguration by configuration {
+class DefaultChangeLog @Inject constructor(val gitPlus: GitPlus, var configuration: ChangeLogConfiguration, val versionHistoryBuilder: VersionHistoryBuilder) : ChangeLog, ChangeLogConfiguration by configuration {
     private val log = LoggerFactory.getLogger(this.javaClass.name)
 
     val velocityContext: VelocityContext

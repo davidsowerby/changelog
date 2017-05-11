@@ -12,8 +12,9 @@ import java.io.File
  * Created by David Sowerby on 13 Mar 2016
  */
 
-class DefaultChangeLogConfiguration : ChangeLogConfiguration {
-    override var projectName: String = notSpecified
+
+data class DefaultChangeLogConfiguration(override var projectName: String = notSpecified) : ChangeLogConfiguration {
+
     override var remoteRepoUser: String = notSpecified
     override var templateName = DEFAULT_TEMPLATE
     override var labelGroups: Map<String, Set<String>> = defaultLabelGroups
