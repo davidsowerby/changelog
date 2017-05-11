@@ -1,3 +1,7 @@
 build/*
 .idea/*
 .gradle
+.idea/
+build/
+not specified
+out
