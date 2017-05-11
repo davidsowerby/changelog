@@ -1,7 +1,8 @@
 build/*
-.idea/*
 .gradle
 .idea/
-build/
 not specified
 out
+changelog.iml
+changelog.ipr
+changelog.iws
