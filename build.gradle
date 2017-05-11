@@ -26,7 +26,7 @@ plugins {
 apply plugin: 'kotlin'
 apply plugin: "jacoco"
 
-version = '0.3.5.17'
+version = '0.3.6.18'
 group = 'uk.q3c.build'
 
 repositories {

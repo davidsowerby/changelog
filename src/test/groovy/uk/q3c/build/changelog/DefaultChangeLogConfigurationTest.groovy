@@ -2,7 +2,6 @@ package uk.q3c.build.changelog
 
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
-import kotlin.UninitializedPropertyAccessException
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
@@ -54,6 +53,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.maxCommits == 1000
         config.autoTagLatestCommit
 
+
         // Output layout and presentation properties
         config.separatePullRequests
         config.pullRequestTitle == DefaultChangeLogConfiguration.DEFAULT_PULL_REQUESTS_TITLE
@@ -63,6 +63,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         // Output destination
         config.outputFilename == 'changelog.md'
         config.outputTarget == OutputTarget.WIKI_ROOT
+        config.outputFileSpec == new File(".", 'changelog.md')
 
         //commit control
         config.typoMap == DefaultChangeLogConfiguration.defaultTypoMap
@@ -73,15 +74,12 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.versionTagFilter instanceof AllTagsAreVersionsTagFilter
         config.currentBuildTagName == "current build"
 
+        // source
+        config.projectDirParent == new File(".")
+
     }
 
-    def "defaults with late init"() {
-        when:
-        config.outputFileSpec
 
-        then:
-        thrown UninitializedPropertyAccessException
-    }
 
     def "set get"() {
         given:

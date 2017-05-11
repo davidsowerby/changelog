@@ -26,7 +26,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var outputFilename = "changelog.md"
     override var pullRequestTitle = DEFAULT_PULL_REQUESTS_TITLE
     override var outputTarget = OutputTarget.WIKI_ROOT
-    override lateinit var outputFileSpec: File
+    override var outputFileSpec: File = File(".", outputFilename)
     override var fromCommitId = notSpecified
     override var toCommitId = notSpecified
     override var fromVersionId = notSpecified
@@ -38,7 +38,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var processingAsVersions: Boolean = true
     override var versionTagFilter: VersionTagFilter = AllTagsAreVersionsTagFilter()
     override var showDetail = true
-    override lateinit var projectDirParent: File
+    override var projectDirParent: File = File(".")
     override var currentBuildTagName = "current build"
 
 
