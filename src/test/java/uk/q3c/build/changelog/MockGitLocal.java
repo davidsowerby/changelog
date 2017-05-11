@@ -150,8 +150,8 @@ public class MockGitLocal implements GitLocal {
     }
 
     @Override
-    public void commit(String s) {
-
+    public GitSHA commit(String s) {
+        return new GitSHA(DigestUtils.sha1Hex("xx"));
     }
 
     @NotNull
@@ -207,11 +207,6 @@ public class MockGitLocal implements GitLocal {
         return ImmutableList.copyOf(commits1);
     }
 
-
-    @Override
-    public void tag(String s) {
-
-    }
 
     @Override
     public void tagLightweight(String s) {
@@ -441,5 +436,32 @@ public class MockGitLocal implements GitLocal {
     @Override
     public ImmutableList<GitCommit> extractCommitsFor(GitBranch gitBranch) {
         return ImmutableList.copyOf(commits1);
+    }
+
+    @Override
+    public void checkoutCommit(GitSHA gitSHA, String s) {
+
+    }
+
+    @Override
+    public void tag(String s, String s1) {
+
+    }
+
+    @Override
+    public boolean isInitDone() {
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public PushResponse pushTag(String s) {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public PushResponse pushAllTags() {
+        return null;
     }
 }
