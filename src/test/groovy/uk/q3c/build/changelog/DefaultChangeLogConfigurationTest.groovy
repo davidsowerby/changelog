@@ -1,5 +1,6 @@
 package uk.q3c.build.changelog
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import org.junit.Rule
@@ -12,6 +13,7 @@ import uk.q3c.build.gitplus.local.WikiLocal
 import uk.q3c.build.gitplus.remote.GitRemoteResolver
 import uk.q3c.build.gitplus.remote.ServiceProvider
 import uk.q3c.build.gitplus.remote.github.GitHubRemote
+
 /**
  * Created by David Sowerby on 13 Mar 2016
  */
@@ -53,7 +55,6 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.maxCommits == 1000
         config.autoTagLatestCommit
 
-
         // Output layout and presentation properties
         config.separatePullRequests
         config.pullRequestTitle == DefaultChangeLogConfiguration.DEFAULT_PULL_REQUESTS_TITLE
@@ -78,7 +79,6 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.projectDirParent == new File(".")
 
     }
-
 
 
     def "set get"() {
@@ -237,5 +237,21 @@ class DefaultChangeLogConfigurationTest extends Specification {
 
         then:
         config.exclusionTags == ImmutableSet.of("a", "b")
+    }
+
+    def "Json round trip"() {
+        given:
+        ObjectMapper objectMapper = new ObjectMapper()
+        StringWriter sw = new StringWriter()
+        //do not want all defaults for test
+        config.branch = new GitBranch("wiggly")
+        config.projectName = "beanbag"
+
+        when:
+        objectMapper.writeValue(sw, config)
+        DefaultChangeLogConfiguration config2 = objectMapper.readValue(sw.toString(), DefaultChangeLogConfiguration.class)
+
+        then:
+        config2.equals(config)
     }
 }

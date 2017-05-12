@@ -1,5 +1,6 @@
 package uk.q3c.build.changelog
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import uk.q3c.build.gitplus.local.GitBranch
@@ -36,6 +37,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var maxCommits: Int = 1000
     override var maxVersions: Int = 50
     override var processingAsVersions: Boolean = true
+    @JsonIgnore
     override var versionTagFilter: VersionTagFilter = AllTagsAreVersionsTagFilter()
     override var showDetail = true
     override var projectDirParent: File = File(".")
