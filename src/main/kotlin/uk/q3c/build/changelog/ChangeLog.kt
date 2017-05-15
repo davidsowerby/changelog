@@ -8,6 +8,8 @@ import java.io.File
  */
 interface ChangeLog : ChangeLogConfiguration {
 
+    var configuration: ChangeLogConfiguration
+
     /**
      * A combination of [outputFilename] and [outputTarget], unless USE_FILE_SPEC is selected, in which case the [outputFileSpec] must
      * be given
