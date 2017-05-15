@@ -83,6 +83,11 @@ public class MockGitRemote implements GitRemote {
         return null;
     }
 
+    @Override
+    public void setConfiguration(GitRemoteConfiguration gitRemoteConfiguration) {
+
+    }
+
     @NotNull
     @Override
     public GitRemoteUrlMapper getUrlMapper() {
@@ -93,7 +98,6 @@ public class MockGitRemote implements GitRemote {
     public boolean isIssueFixWord(String s) {
         return fixWords.contains(s.toLowerCase());
     }
-
 
     public List<GPIssue> issueSet(int index) {
         switch (index) {
@@ -110,7 +114,6 @@ public class MockGitRemote implements GitRemote {
         }
         throw new UnsupportedOperationException("test not configured for that set index");
     }
-
 
     @NotNull
     @Override

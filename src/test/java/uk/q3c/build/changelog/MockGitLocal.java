@@ -24,12 +24,12 @@ import java.util.List;
  */
 @SuppressWarnings("HardcodedFileSeparator")
 public class MockGitLocal implements GitLocal {
-    private final GitLocalConfiguration configuration = new DefaultGitLocalConfiguration();
     List<GitCommit> commits1 = new ArrayList<>();
     List<Tag> tags = new ArrayList<>();
     ZonedDateTime commitDate = ZonedDateTime.of(LocalDateTime.of(2010, 11, 11, 12, 2), ZoneId.of("Z"));
     ZonedDateTime releaseDate = ZonedDateTime.of(LocalDateTime.of(2015, 1, 11, 12, 12), ZoneId.of("Z"));
     PersonIdent personIdent = new PersonIdent("me", "me@there.com");
+    private GitLocalConfiguration configuration = new DefaultGitLocalConfiguration();
 
     public MockGitLocal() {
         createCommits();
@@ -68,6 +68,11 @@ public class MockGitLocal implements GitLocal {
     @Override
     public GitLocalConfiguration getLocalConfiguration() {
         return null;
+    }
+
+    @Override
+    public void setLocalConfiguration(GitLocalConfiguration gitLocalConfiguration) {
+        this.configuration = gitLocalConfiguration;
     }
 
     @NotNull
@@ -206,7 +211,6 @@ public class MockGitLocal implements GitLocal {
     public ImmutableList<GitCommit> extractMasterCommits() {
         return ImmutableList.copyOf(commits1);
     }
-
 
     @Override
     public void tagLightweight(String s) {
