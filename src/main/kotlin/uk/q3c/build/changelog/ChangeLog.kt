@@ -8,7 +8,10 @@ import java.io.File
  */
 interface ChangeLog : ChangeLogConfiguration {
 
-    var configuration: ChangeLogConfiguration
+    /**
+     * Must be a val, because Kotlin delegation will not recognise a replacement made after construction
+     */
+    val configuration: ChangeLogConfiguration
 
     /**
      * A combination of [outputFilename] and [outputTarget], unless USE_FILE_SPEC is selected, in which case the [outputFileSpec] must

@@ -270,7 +270,11 @@ interface ChangeLogConfiguration {
      */
     fun validate()
 
-
+    /**
+     * Copies all values (safely where required) from [other] to this instance.  It would be easier to replace the whole instance,
+     * but this causes Kotlin's delegation to fail in [ChangeLog]
+     */
+    fun copyFrom(other: ChangeLogConfiguration)
 }
 
 /**

@@ -19,6 +19,7 @@ import java.io.StringWriter
  * version.  GitCommit parses commit messages fro issue fix references, and the VersionRecord collates those into groups of issues (for example, 'bug',
  * 'enhancement', 'quality'.  The mapping of issues labels to issue groups is user defined via [ChangeLogConfiguration.labelGroups].
  *
+ *  Note that Kotlin delegation does not allow the configuration to be changed for another instance, which means that [ChangeLogConfiguration.copyFrom] is needed
  *
  * Output format is defined by a Velocity template
  *
@@ -30,7 +31,7 @@ import java.io.StringWriter
  */
 class DefaultChangeLog @Inject constructor(
         val gitPlus: GitPlus,
-        override var configuration: ChangeLogConfiguration,
+        override val configuration: ChangeLogConfiguration,
         val versionHistoryBuilder: VersionHistoryBuilder)
 
     : ChangeLog, ChangeLogConfiguration by configuration {

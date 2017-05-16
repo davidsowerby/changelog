@@ -252,6 +252,25 @@ class DefaultChangeLogConfigurationTest extends Specification {
         DefaultChangeLogConfiguration config2 = objectMapper.readValue(sw.toString(), DefaultChangeLogConfiguration.class)
 
         then:
-        config2.equals(config)
+        config2 == config
+    }
+
+    def "copyFrom"() {
+        given:
+        DefaultChangeLogConfiguration config2 = new DefaultChangeLogConfiguration()
+
+        when:
+        config2.copyFrom(config)
+
+        then: "defaults match"
+        config == config2
+
+        when: "some changes to defaults"
+        config.branch = new GitBranch("wiggly")
+        config.projectName = "beanbag"
+        config2.copyFrom(config)
+
+        then: "changes match"
+        config == config2
     }
 }

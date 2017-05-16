@@ -43,6 +43,35 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var projectDirParent: File = File(".")
     override var currentBuildTagName = "current build"
 
+    override fun copyFrom(other: ChangeLogConfiguration) {
+        this.projectName = other.projectName
+        this.remoteRepoUser = other.remoteRepoUser
+        this.templateName = other.templateName
+        this.labelGroups = ImmutableMap.copyOf(other.labelGroups)
+        this.separatePullRequests = other.separatePullRequests
+        this.exclusionTags = ImmutableSet.copyOf(other.exclusionTags)
+
+        this.typoMap = ImmutableMap.copyOf(other.typoMap)
+        this.correctTypos = other.correctTypos
+        this.outputFilename = other.outputFilename
+        this.pullRequestTitle = other.pullRequestTitle
+        this.outputTarget = other.outputTarget
+        this.outputFileSpec = other.outputFileSpec
+        this.fromCommitId = other.fromCommitId
+        this.toCommitId = other.toCommitId
+        this.fromVersionId = other.fromVersionId
+        this.toVersionId = other.toVersionId
+        this.branch = other.branch // Immutable
+        this.autoTagLatestCommit = other.autoTagLatestCommit
+        this.maxCommits = other.maxCommits
+        this.maxVersions = other.maxVersions
+        this.processingAsVersions = other.processingAsVersions
+        this.versionTagFilter = other.versionTagFilter
+        this.showDetail = other.showDetail
+        this.projectDirParent = other.projectDirParent
+        this.currentBuildTagName = other.currentBuildTagName
+
+    }
 
     override fun processAsVersions(): ChangeLogConfiguration {
         processingAsVersions = true
