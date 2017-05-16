@@ -86,7 +86,7 @@ class DefaultChangeLogTest2 extends Specification {
 
         then:
         !FileTestUtil.compare(changeLog.outputFile(), expectedResult, 4).isPresent() //cannot compare line 4, date changes
-        FileUtils.readLines(changeLog.outputFile()).get(4).startsWith('# [current build](https://github.com/davidsowerby/dummy/tree/current build)')
+        FileUtils.readLines(changeLog.outputFile()).get(4).startsWith('# [current build](https://github.com/davidsowerby/dummy/tree/develop)')
     }
 
 

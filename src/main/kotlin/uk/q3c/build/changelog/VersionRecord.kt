@@ -41,6 +41,15 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         get() = tag.tagName
 
 
+    val tagRef: String
+        get() = if (tag is CurrentBuildTag) {
+            changeLogConfiguration.branch.name
+        } else {
+            tag.tagName
+        }
+
+
+
     val releaseDate: ZonedDateTime
         get() {
             return tag.releaseDate

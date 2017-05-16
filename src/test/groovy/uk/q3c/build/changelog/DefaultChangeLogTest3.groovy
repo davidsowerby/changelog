@@ -1,11 +1,11 @@
 package uk.q3c.build.changelog
 
 import com.google.inject.Inject
+import org.apache.commons.io.FileUtils
 import org.junit.Ignore
 import spock.guice.UseModules
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
-
 /**
  *
  * Generates the change log for this project to its wiki, but with a changed name ('changelog-test.md') so as not to
@@ -16,8 +16,10 @@ import uk.q3c.build.gitplus.gitplus.GitPlus
 @UseModules([ChangeLogModule])
 class DefaultChangeLogTest3 extends Specification {
 
+
     @Inject
     ChangeLog changeLog
+
 
     def "generate log for this project, different file name"() {
         given:
@@ -34,6 +36,12 @@ class DefaultChangeLogTest3 extends Specification {
 
         then:
         outputFile.exists()
+
+        when:
+        String s = FileUtils.readFileToString(outputFile)
+
+        then:
+        s.contains("[current build](https://github.com/davidsowerby/changelog/tree/develop)")
     }
 
     def "getGitPlus()"() {
