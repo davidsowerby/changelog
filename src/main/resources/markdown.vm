@@ -8,7 +8,7 @@ $H1 Change Log for $projectName
 
 #foreach ($versionRecord in $versionRecords)
 
-    $H1 [$versionRecord.tagName]($tagUrl$versionRecord.tagRef) ($dateTool.format($DATE_FORMAT,$versionRecord.releaseDateAsDate))
+$H1 [$versionRecord.tagName]($tagUrl$versionRecord.tagRef) ($dateTool.format($DATE_FORMAT,$versionRecord.releaseDateAsDate))
 
 $H2 Summary
 

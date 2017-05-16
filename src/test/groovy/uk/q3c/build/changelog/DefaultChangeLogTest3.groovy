@@ -1,7 +1,6 @@
 package uk.q3c.build.changelog
 
 import com.google.inject.Inject
-import org.apache.commons.io.FileUtils
 import org.junit.Ignore
 import spock.guice.UseModules
 import spock.lang.Specification
@@ -37,11 +36,6 @@ class DefaultChangeLogTest3 extends Specification {
         then:
         outputFile.exists()
 
-        when:
-        String s = FileUtils.readFileToString(outputFile)
-
-        then:
-        s.contains("[current build](https://github.com/davidsowerby/changelog/tree/develop)")
     }
 
     def "getGitPlus()"() {

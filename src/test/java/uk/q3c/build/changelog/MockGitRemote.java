@@ -83,10 +83,7 @@ public class MockGitRemote implements GitRemote {
         return null;
     }
 
-    @Override
-    public void setConfiguration(GitRemoteConfiguration gitRemoteConfiguration) {
 
-    }
 
     @NotNull
     @Override
@@ -416,10 +413,6 @@ public class MockGitRemote implements GitRemote {
         return null;
     }
 
-    @Override
-    public void copy(GitRemoteConfiguration gitRemoteConfiguration) {
-
-    }
 
     @NotNull
     @Override
@@ -483,5 +476,9 @@ public class MockGitRemote implements GitRemote {
     @Override
     public String issuesUrl() {
         return null;
+    }
+
+    @Override
+    public void copyFrom(GitRemoteConfiguration gitRemoteConfiguration) {
     }
 }

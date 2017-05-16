@@ -70,10 +70,7 @@ public class MockGitLocal implements GitLocal {
         return null;
     }
 
-    @Override
-    public void setLocalConfiguration(GitLocalConfiguration gitLocalConfiguration) {
-        this.configuration = gitLocalConfiguration;
-    }
+
 
     @NotNull
     @Override
@@ -467,5 +464,10 @@ public class MockGitLocal implements GitLocal {
     @Override
     public PushResponse pushAllTags() {
         return null;
+    }
+
+    @Override
+    public void copyFrom(GitLocalConfiguration gitLocalConfiguration) {
+        throw new RuntimeException("TODO");
     }
 }
