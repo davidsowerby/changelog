@@ -10,6 +10,7 @@ import org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader
 import org.apache.velocity.tools.generic.DateTool
 import org.slf4j.LoggerFactory
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.CloneExistsResponse
 import java.io.File
 import java.io.IOException
 import java.io.StringWriter
@@ -97,6 +98,9 @@ class DefaultChangeLog @Inject constructor(
         gitPlus.local.projectDirParent = projectDirParent
         if (outputTarget == OutputTarget.WIKI_ROOT) {
             gitPlus.wikiLocal.active(true)
+            gitPlus.wikiLocal.cloneFromRemote = true
+            // when running Gradle directly from command line, don't want to fail unnecessarily
+            gitPlus.wikiLocal.cloneExistsResponse = CloneExistsResponse.PULL
         }
         gitPlus.execute()
     }

@@ -1,8 +1,8 @@
 package uk.q3c.build.changelog
 
 import com.google.inject.Inject
-import org.junit.Ignore
 import spock.guice.UseModules
+import spock.lang.Ignore
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
 /**
@@ -31,6 +31,12 @@ class DefaultChangeLogTest3 extends Specification {
         changeLog.projectName('changelog').remoteRepoUser('davidsowerby').projectDirParent(gitHome)
 
         when:
+        changeLog.generate()
+
+        then:
+        outputFile.exists()
+
+        when: "run a second time to ensure wiki clone does not fail"
         changeLog.generate()
 
         then:
