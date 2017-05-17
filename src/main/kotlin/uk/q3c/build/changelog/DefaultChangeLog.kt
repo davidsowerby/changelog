@@ -81,6 +81,7 @@ class DefaultChangeLog @Inject constructor(
         val w = StringWriter()
         velocityTemplate.merge(velocityContext, w)
         val outputFile = outputFile()
+        log.debug("Output file is: {}", outputFile.absolutePath)
         FileUtils.writeStringToFile(outputFile, w.toString())
         if (outputTarget == OutputTarget.WIKI_ROOT) {
             val wikiLocal = gitPlus.wikiLocal
@@ -92,10 +93,12 @@ class DefaultChangeLog @Inject constructor(
     }
 
     private fun prepareGitPlus() {
+        log.debug("Preparing GitPlus")
         gitPlus.local.projectName = projectName
         gitPlus.remote.repoUser = remoteRepoUser
         gitPlus.remote.repoName = projectName
         gitPlus.local.projectDirParent = projectDirParent
+        log.debug("Output target is {}", outputTarget)
         if (outputTarget == OutputTarget.WIKI_ROOT) {
             gitPlus.wikiLocal.active(true)
             gitPlus.wikiLocal.cloneFromRemote = true

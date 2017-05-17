@@ -3,6 +3,7 @@ package uk.q3c.build.changelog
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
+import org.slf4j.LoggerFactory
 import uk.q3c.build.gitplus.local.GitBranch
 import java.io.File
 
@@ -15,7 +16,7 @@ import java.io.File
 
 
 data class DefaultChangeLogConfiguration(override var projectName: String = notSpecified) : ChangeLogConfiguration {
-
+    private val log = LoggerFactory.getLogger(this.javaClass.name)
     override var remoteRepoUser: String = notSpecified
     override var templateName = DEFAULT_TEMPLATE
     override var labelGroups: Map<String, Set<String>> = defaultLabelGroups
@@ -85,6 +86,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
 
 
     override fun validate() {
+        log.debug("validating configuration")
         if (maxVersions <= 0 && maxCommits <= 0) {
             throw ChangeLogConfigurationException("Both maxCommits and maxVersions are <=0.  No output would be produced")
         }
