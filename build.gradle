@@ -26,7 +26,7 @@ plugins {
 apply plugin: 'kotlin'
 apply plugin: "jacoco"
 
-version = '0.4.10.30'
+version = '0.4.11.31'
 group = 'uk.q3c.build'
 
 repositories {
@@ -36,7 +36,7 @@ repositories {
 
 dependencies {
     //Git
-    compile 'uk.q3c.build:gitplus:0.24.8.83'
+    compile 'uk.q3c.build:gitplus:0.25.0.84'
     //guice
     compile 'com.google.inject:guice:4.1.0'
 

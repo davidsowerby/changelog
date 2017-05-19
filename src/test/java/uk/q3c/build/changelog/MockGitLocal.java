@@ -3,9 +3,12 @@ package uk.q3c.build.changelog;
 import com.google.common.collect.ImmutableList;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.MergeCommand;
+import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.merge.MergeStrategy;
 import org.jetbrains.annotations.NotNull;
 import uk.q3c.build.gitplus.GitSHA;
 import uk.q3c.build.gitplus.gitplus.FileDeleteApprover;
@@ -469,5 +472,11 @@ public class MockGitLocal implements GitLocal {
     @Override
     public void copyFrom(GitLocalConfiguration gitLocalConfiguration) {
         throw new RuntimeException("TODO");
+    }
+
+    @NotNull
+    @Override
+    public MergeResult mergeBranch(GitBranch gitBranch, MergeStrategy mergeStrategy, MergeCommand.FastForwardMode fastForwardMode) {
+        return null;
     }
 }
