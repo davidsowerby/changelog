@@ -432,7 +432,7 @@ public class MockGitRemote implements GitRemote {
     }
 
     @Override
-    public void setParent(GitRemote gitRemote) {
+    public void setParent(GitRemoteConfiguration gitRemoteConfiguration) {
 
     }
 
