@@ -14,6 +14,7 @@ import uk.q3c.build.gitplus.GitSHA;
 import uk.q3c.build.gitplus.gitplus.FileDeleteApprover;
 import uk.q3c.build.gitplus.local.*;
 import uk.q3c.build.gitplus.remote.GitRemote;
+import uk.q3c.build.gitplus.remote.GitRemoteConfiguration;
 
 import java.io.File;
 import java.time.LocalDateTime;
@@ -420,7 +421,7 @@ public class MockGitLocal implements GitLocal {
     }
 
     @Override
-    public void validate(GitRemote gitRemote) {
+    public void validate(GitRemoteConfiguration gitRemote) {
 
     }
 
