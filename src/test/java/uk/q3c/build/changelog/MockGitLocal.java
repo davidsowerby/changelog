@@ -225,13 +225,13 @@ public class MockGitLocal implements GitLocal {
 
     @NotNull
     @Override
-    public GitSHA latestCommitSHA(GitBranch gitBranch) {
+    public GitSHA headCommitSHA(GitBranch gitBranch) {
         return null;
     }
 
     @NotNull
     @Override
-    public GitSHA latestDevelopCommitSHA() {
+    public GitSHA headDevelopCommitSHA() {
         return null;
     }
 
@@ -479,5 +479,10 @@ public class MockGitLocal implements GitLocal {
     @Override
     public MergeResult mergeBranch(GitBranch gitBranch, MergeStrategy mergeStrategy, MergeCommand.FastForwardMode fastForwardMode) {
         return null;
+    }
+
+    @Override
+    public void pull(String s) {
+
     }
 }

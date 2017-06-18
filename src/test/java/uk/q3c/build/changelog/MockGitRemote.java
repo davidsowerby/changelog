@@ -188,17 +188,7 @@ public class MockGitRemote implements GitRemote {
         return null;
     }
 
-    @NotNull
-    @Override
-    public GitSHA latestDevelopCommitSHA() {
-        return null;
-    }
 
-    @NotNull
-    @Override
-    public GitSHA latestCommitSHA(GitBranch gitBranch) {
-        return null;
-    }
 
     @Override
     public boolean hasBranch(GitBranch gitBranch) {
@@ -481,5 +471,17 @@ public class MockGitRemote implements GitRemote {
 
     @Override
     public void copyFrom(GitRemoteConfiguration gitRemoteConfiguration) {
+    }
+
+    @NotNull
+    @Override
+    public GitSHA developHeadCommit() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public GitSHA headCommit(GitBranch gitBranch) {
+        return null;
     }
 }
