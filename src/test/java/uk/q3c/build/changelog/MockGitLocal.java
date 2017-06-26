@@ -218,11 +218,6 @@ public class MockGitLocal implements GitLocal {
 
     }
 
-    @Override
-    public void verifyRemoteFromLocal() {
-
-    }
-
     @NotNull
     @Override
     public GitSHA headCommitSHA(GitBranch gitBranch) {

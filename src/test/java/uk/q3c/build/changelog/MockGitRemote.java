@@ -484,4 +484,20 @@ public class MockGitRemote implements GitRemote {
     public GitSHA headCommit(GitBranch gitBranch) {
         return null;
     }
+
+    @NotNull
+    @Override
+    public GitLocal getLocal() {
+        return null;
+    }
+
+    @Override
+    public void setLocal(GitLocal gitLocal) {
+
+    }
+
+    @Override
+    public void verifyFromLocal() {
+
+    }
 }
