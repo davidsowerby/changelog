@@ -31,11 +31,7 @@ apply plugin: 'uk.q3c.kaytee'
 group = 'uk.q3c.build'
 
 kaytee {
-    baseVersion = "0.5.0.0"
-    release {
-        mergeToMaster = false
-        toBintray = false
-    }
+    baseVersion = "0.5.1.0"
 }
 
 bintray {
