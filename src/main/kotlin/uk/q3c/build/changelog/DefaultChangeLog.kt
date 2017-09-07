@@ -94,6 +94,7 @@ class DefaultChangeLog @Inject constructor(
 
     private fun prepareGitPlus() {
         log.debug("Preparing GitPlus")
+        gitPlus.propertiesFromGradle()
         gitPlus.local.projectName = projectName
         gitPlus.remote.repoUser = remoteRepoUser
         gitPlus.remote.repoName = projectName
@@ -123,7 +124,6 @@ class DefaultChangeLog @Inject constructor(
                 val currentDir = File(".")
                 outputFile = File(currentDir, outputFilename)
             }
-            else -> throw ChangeLogConfigurationException("Unrecognised output directory, " + outputTarget.name)
         }
         return outputFile
     }

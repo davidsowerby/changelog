@@ -1,7 +1,8 @@
 //noinspection GrPackage
 buildscript {
-    ext.kotlin_version = '1.1.3-2'
-    ext.kaytee_plugin_version = "0.15.2.0"
+    ext.kaytee_plugin_version = "0.18.2.0"
+    ext.kotlin_version = '1.1.4-3'
+
     repositories {
         maven {
             url 'https://oss.sonatype.org/content/repositories/snapshots'
@@ -24,7 +25,9 @@ apply plugin: 'uk.q3c.kaytee'
 group = 'uk.q3c.build'
 
 kaytee {
-    baseVersion = "0.5.2.0"
+    version {
+        number = "0.5.3.0"
+    }
 }
 
 bintray {
@@ -39,12 +42,10 @@ repositories {
 
 dependencies {
     //Git
-    compile 'uk.q3c.build:gitplus:0.29.3.0.222ca19'
+    compile 'uk.q3c.build:gitplus:0.30.0.0'
     //guice
     compile 'com.google.inject:guice:4.1.0'
 
-    // JSON
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.8.8'
 
     // kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -62,12 +63,12 @@ dependencies {
     testCompile 'cglib:cglib-nodep:3.2.0' // needed for Spock mocking
     testCompile 'org.objenesis:objenesis:2.2' // needed for Spock mocking
     testCompile 'org.spockframework:spock-guice:1.0-groovy-2.4' // Spock with Guice
-    testCompile 'org.assertj:assertj-core:3.5.2'
-    testCompile 'uk.q3c:q3c-testUtil:0.9.0.140'
+    testCompile 'org.assertj:assertj-core:3.8.0'
+    testCompile 'uk.q3c.util:q3c-testutils:0.11.0.1'
     testCompile 'commons-codec:commons-codec:1.10'
 
     //json testing
-    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.8.8'
+//    testCompile 'com.fasterxml.jackson.core:jackson-databind:2.8.8'
 
 
 }

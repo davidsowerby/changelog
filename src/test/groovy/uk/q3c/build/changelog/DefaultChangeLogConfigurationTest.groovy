@@ -6,7 +6,8 @@ import com.google.common.collect.ImmutableSet
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
-import uk.q3c.build.gitplus.gitplus.DefaultGitPlus
+import uk.q3c.build.gitplus.GitPlusFactory
+import uk.q3c.build.gitplus.gitplus.GitPlus
 import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.GitLocal
 import uk.q3c.build.gitplus.local.WikiLocal
@@ -21,7 +22,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
 
 
     DefaultChangeLogConfiguration config
-    DefaultGitPlus gitPlus
+    GitPlus gitPlus
     GitLocal gitLocal = Mock(GitLocal)
     WikiLocal wikiLocal = Mock(WikiLocal)
     GitHubRemote defaultRemote = Mock(GitHubRemote)
@@ -38,7 +39,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         remoteResolver.defaultProvider() >> ServiceProvider.GITHUB
         defaultRemote.repoUser(_) >> defaultRemote
         defaultRemote.repoName(_) >> defaultRemote
-        gitPlus = new DefaultGitPlus(gitLocal, wikiLocal, remoteResolver)
+        gitPlus = GitPlusFactory.instance
         gitPlus.remote.repoUser('davidsowerby').repoName('scratch')
     }
 

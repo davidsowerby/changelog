@@ -5,13 +5,23 @@ import com.google.common.collect.ImmutableSet;
 import org.eclipse.jgit.transport.CredentialsProvider;
 import org.jetbrains.annotations.NotNull;
 import uk.q3c.build.gitplus.GitSHA;
+import uk.q3c.build.gitplus.gitplus.GitPlus;
 import uk.q3c.build.gitplus.local.GitBranch;
-import uk.q3c.build.gitplus.local.GitLocal;
 import uk.q3c.build.gitplus.local.GitLocalConfiguration;
-import uk.q3c.build.gitplus.remote.*;
+import uk.q3c.build.gitplus.remote.DefaultGitRemoteUrlMapper;
+import uk.q3c.build.gitplus.remote.GPIssue;
+import uk.q3c.build.gitplus.remote.GitRemote;
+import uk.q3c.build.gitplus.remote.GitRemoteConfiguration;
+import uk.q3c.build.gitplus.remote.GitRemoteException;
+import uk.q3c.build.gitplus.remote.GitRemoteUrlMapper;
+import uk.q3c.build.gitplus.remote.RemoteRepoDeleteApprover;
 import uk.q3c.build.gitplus.remote.github.DefaultGitHubRemote;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by David Sowerby on 15 Nov 2016
@@ -24,7 +34,7 @@ public class MockGitRemote implements GitRemote {
     private final GitRemoteUrlMapper urlMapper = new DefaultGitRemoteUrlMapper();
 
     public MockGitRemote() {
-        urlMapper.setParent(this);
+        urlMapper.setOwner(this);
     }
 
     public void createIssues(int index) {
@@ -196,7 +206,7 @@ public class MockGitRemote implements GitRemote {
     }
 
     @Override
-    public void prepare(GitLocal gitLocal) {
+    public void prepare(GitPlus gitPlus) {
 
     }
 
@@ -416,16 +426,7 @@ public class MockGitRemote implements GitRemote {
 
     }
 
-    @NotNull
-    @Override
-    public GitRemote getParent() {
-        return null;
-    }
 
-    @Override
-    public void setParent(GitRemoteConfiguration gitRemoteConfiguration) {
-
-    }
 
     @NotNull
     @Override
@@ -485,19 +486,42 @@ public class MockGitRemote implements GitRemote {
         return null;
     }
 
+
+
+    @Override
+    public void verifyFromLocal() {
+
+    }
+
     @NotNull
     @Override
-    public GitLocal getLocal() {
+    public GitPlus getParent() {
         return null;
     }
 
     @Override
-    public void setLocal(GitLocal gitLocal) {
+    public void setParent(GitPlus gitPlus) {
 
     }
 
     @Override
-    public void verifyFromLocal() {
+    public int getVersion() {
+        return 0;
+    }
+
+    @Override
+    public void setVersion(int i) {
+
+    }
+
+    @NotNull
+    @Override
+    public GitRemoteConfiguration getOwner() {
+        return null;
+    }
+
+    @Override
+    public void setOwner(GitRemoteConfiguration gitRemoteConfiguration) {
 
     }
 }

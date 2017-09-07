@@ -8,12 +8,21 @@ import org.eclipse.jgit.api.MergeResult;
 import org.eclipse.jgit.api.Status;
 import org.eclipse.jgit.dircache.DirCache;
 import org.eclipse.jgit.lib.PersonIdent;
+import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.merge.MergeStrategy;
 import org.jetbrains.annotations.NotNull;
 import uk.q3c.build.gitplus.GitSHA;
 import uk.q3c.build.gitplus.gitplus.FileDeleteApprover;
-import uk.q3c.build.gitplus.local.*;
-import uk.q3c.build.gitplus.remote.GitRemote;
+import uk.q3c.build.gitplus.gitplus.GitPlus;
+import uk.q3c.build.gitplus.local.CloneExistsResponse;
+import uk.q3c.build.gitplus.local.DefaultGitLocalConfiguration;
+import uk.q3c.build.gitplus.local.GitBranch;
+import uk.q3c.build.gitplus.local.GitCommit;
+import uk.q3c.build.gitplus.local.GitLocal;
+import uk.q3c.build.gitplus.local.GitLocalConfiguration;
+import uk.q3c.build.gitplus.local.ProjectCreator;
+import uk.q3c.build.gitplus.local.PushResponse;
+import uk.q3c.build.gitplus.local.Tag;
 import uk.q3c.build.gitplus.remote.GitRemoteConfiguration;
 
 import java.io.File;
@@ -68,24 +77,7 @@ public class MockGitLocal implements GitLocal {
         return commit;
     }
 
-    @NotNull
-    @Override
-    public GitLocalConfiguration getLocalConfiguration() {
-        return null;
-    }
 
-
-
-    @NotNull
-    @Override
-    public GitRemote getRemote() {
-        return null;
-    }
-
-    @Override
-    public void setRemote(GitRemote gitRemote) {
-
-    }
 
     @NotNull
     @Override
@@ -108,10 +100,7 @@ public class MockGitLocal implements GitLocal {
 
     }
 
-    @Override
-    public void prepare(GitRemote gitRemote) {
 
-    }
 
     @Override
     public void pull() {
@@ -301,27 +290,8 @@ public class MockGitLocal implements GitLocal {
 
     }
 
-    @NotNull
-    @Override
-    public String getTaggerName() {
-        return null;
-    }
 
-    @Override
-    public void setTaggerName(String s) {
 
-    }
-
-    @NotNull
-    @Override
-    public String getTaggerEmail() {
-        return null;
-    }
-
-    @Override
-    public void setTaggerEmail(String s) {
-
-    }
 
     @Override
     public boolean getCreate() {
@@ -379,17 +349,7 @@ public class MockGitLocal implements GitLocal {
         return this;
     }
 
-    @NotNull
-    @Override
-    public GitLocalConfiguration taggerEmail(String s) {
-        return null;
-    }
 
-    @NotNull
-    @Override
-    public GitLocalConfiguration taggerName(String s) {
-        return null;
-    }
 
     @NotNull
     @Override
@@ -478,6 +438,44 @@ public class MockGitLocal implements GitLocal {
 
     @Override
     public void pull(String s) {
+
+    }
+
+    @NotNull
+    @Override
+    public GitLocalConfiguration getConfiguration() {
+        return null;
+    }
+
+    @NotNull
+    @Override
+    public GitPlus getParent() {
+        return null;
+    }
+
+    @Override
+    public void setParent(GitPlus gitPlus) {
+
+    }
+
+    @Override
+    public void prepare(GitPlus gitPlus) {
+
+    }
+
+    @NotNull
+    @Override
+    public Ref checkoutRemoteBranch(GitBranch gitBranch) {
+        return null;
+    }
+
+    @Override
+    public int getVersion() {
+        return 0;
+    }
+
+    @Override
+    public void setVersion(int i) {
 
     }
 }
