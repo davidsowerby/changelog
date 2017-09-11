@@ -16,6 +16,8 @@ import java.io.File
 
 
 data class DefaultChangeLogConfiguration(override var projectName: String = notSpecified) : ChangeLogConfiguration {
+    @JsonIgnore
+    @Transient
     private val log = LoggerFactory.getLogger(this.javaClass.name)
     override var remoteRepoUser: String = notSpecified
     override var templateName = DEFAULT_TEMPLATE
@@ -28,6 +30,8 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var outputFilename = "changelog.md"
     override var pullRequestTitle = DEFAULT_PULL_REQUESTS_TITLE
     override var outputTarget = OutputTarget.WIKI_ROOT
+    @JsonIgnore
+    @Transient
     override var outputFileSpec: File = File(".", outputFilename)
     override var fromCommitId = notSpecified
     override var toCommitId = notSpecified
@@ -39,8 +43,11 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var maxVersions: Int = 50
     override var processingAsVersions: Boolean = true
     @JsonIgnore
+    @Transient
     override var versionTagFilter: VersionTagFilter = AllTagsAreVersionsTagFilter()
     override var showDetail = true
+    @JsonIgnore
+    @Transient
     override var projectDirParent: File = File(".")
     override var currentBuildTagName = "current build"
 
