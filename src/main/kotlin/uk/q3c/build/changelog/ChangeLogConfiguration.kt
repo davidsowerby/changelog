@@ -17,6 +17,17 @@ interface ChangeLogConfiguration {
     //************************************************************************************************************
 
     // ===========================================================================================================
+    //  Meta
+    // ===========================================================================================================
+
+    /**
+     * Version of configuration structure.  Has to be var to allow loading from JSON
+     */
+    var version: Int
+
+
+
+    // ===========================================================================================================
     //  Project identification
     // ===========================================================================================================
 
@@ -112,7 +123,7 @@ interface ChangeLogConfiguration {
 
     /**
      * When the most recent build is not tagged, a "pseudo tag" is added (if [autoTagLatestCommit] is true).  The name of this tag
-     * is defeind by this property
+     * is defined by this property
      */
     var currentBuildTagName: String
 
@@ -150,23 +161,52 @@ interface ChangeLogConfiguration {
     var showDetail: Boolean
 
     // ===========================================================================================================
-    // Output destination properties
+    // Output destination and control properties
     // ===========================================================================================================
+
+
+    /**
+     * [useStoredIssues] and [storeIssuesLocally] work together to improve performance by reducing the access to the remote API to retrieve issue information, for issue references found in commit comments
+     *
+     * When [useStoredIssues] is true:
+     * - processing looks for a local file holding a local copy of issues. If no file is found, or there are entries missing, these are retrieved from the remote API.
+     *
+     * When [useStoredIssues] is false:
+     * - all issues are retrieved from the remote API
+     *
+     * Default is true
+     */
+
+    var useStoredIssues: Boolean
+
+    /**
+     * Used with [useStoredIssues]
+     *
+     * When [storeIssuesLocally] is true, the change log build process stores a local copy of all issues referenced from commits.  The file is stored in the [outputTarget]
+     *
+     * When false, nothing is stored
+     */
+    var storeIssuesLocally: Boolean
+
+    /**
+     * The file name to use for making a local copy of issue records, to reduce access to the remote API.
+     */
+    var issuesFilename: String
 
     /**
      * The file name to use for the change log output.  Used in conjunction with [outputTarget]
      */
     var outputFilename: String
     /**
-     * The output directory for the generated change log.  Used in conjunction with [outputFilename].  Default is
+     * The output target for the generated change log.  Used in conjunction with [outputFilename].  Default is
      * [OutputTarget.WIKI_ROOT]
      */
     var outputTarget: OutputTarget
     /**
-     * Required only when [outputTarget] is [OutputTarget.USE_FILE_SPEC].  this property then points to the file
+     * Required only when [outputTarget] is [OutputTarget.USE_DIRECTORY_SPEC].  this property then points to the file
      * which is ued as output.
      */
-    var outputFileSpec: File
+    var outputDirectorySpec: File
 
     // ===========================================================================================================
     // Commit comment control properties
@@ -221,7 +261,7 @@ interface ChangeLogConfiguration {
 
     fun pullRequestTitle(pullRequestTitle: String): ChangeLogConfiguration
 
-    fun outputFileSpec(outputFileSpec: File): ChangeLogConfiguration
+    fun outputDirectorySpec(outputDirectorySpec: File): ChangeLogConfiguration
 
     fun branch(branch: GitBranch): ChangeLogConfiguration
 
@@ -258,6 +298,10 @@ interface ChangeLogConfiguration {
      */
     fun processAsCommits(): ChangeLogConfiguration
 
+    fun useStoredIssues(useStoredIssues: Boolean): ChangeLogConfiguration
+    fun storeIssuesLocally(storeIssuesLocally: Boolean): ChangeLogConfiguration
+    fun issuesFilename(issuesFilename: String): ChangeLogConfiguration
+
 
     // ===========================================================================================================
     //    Other functions
@@ -275,11 +319,13 @@ interface ChangeLogConfiguration {
      * but this causes Kotlin's delegation to fail in [ChangeLog]
      */
     fun copyFrom(other: ChangeLogConfiguration)
+
+
 }
 
 /**
  * Used in conjunction with the [ChangeLogConfiguration.outputFile] method to define where the output file is placed
  */
 enum class OutputTarget {
-    PROJECT_ROOT, PROJECT_BUILD_ROOT, WIKI_ROOT, CURRENT_DIR, USE_FILE_SPEC
+    PROJECT_ROOT, PROJECT_BUILD_ROOT, WIKI_ROOT, CURRENT_DIR, USE_DIRECTORY_SPEC
 }

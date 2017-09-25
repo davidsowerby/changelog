@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
 
-import static org.assertj.core.api.Assertions.assertThat
+import static org.assertj.core.api.Assertions.*
 
 /**
  * Limited unit testing - tried to Mock RevCommit with Spock and Mockito, both failed, probably because of the
@@ -38,6 +38,8 @@ class VersionRecordTest extends Specification {
     DefaultChangeLogConfiguration changeLogConfiguration
     ZonedDateTime commitDate = ZonedDateTime.of(LocalDateTime.of(2010, 11, 11, 12, 2), ZoneId.of("Z"))
     ZonedDateTime releaseDate = ZonedDateTime.of(LocalDateTime.of(2015, 1, 11, 12, 12), ZoneId.of("Z"))
+    FileLocator fileLocator = new DefaultFileLocator()
+    IssueRecords issueRecords = Mock(IssueRecords)
 
     def setup() {
         mockRemote = new MockGitRemote()
@@ -57,7 +59,7 @@ class VersionRecordTest extends Specification {
         Tag tag = newTag(tagName)
 
         when:
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
 
         then:
         Map<String, String> lookup = record.getLabelLookup()
@@ -75,7 +77,7 @@ class VersionRecordTest extends Specification {
         Tag tag = newTag(tagName)
 
         when:
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
         record.addCommit(rc1)
 
         then:
@@ -96,16 +98,16 @@ class VersionRecordTest extends Specification {
         final String tagName = "0.1"
         Tag tag = newTag(tagName)
         GPIssue issue1 = newIssue(1, 'Making unnecessary calls', 'bug')
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
         record.addCommit(rc1)
         gitRemote.isIssueFixWord('Fix') >> true
 
         when:
-        record.parse()
+        record.parse(issueRecords)
         Map<String, Set<GPIssue>> fixes = record.getFixesByGroup()
 
         then:
-        1 * gitRemote.getIssue(1) >> issue1
+        1 * issueRecords.getIssue(gitPlus, 1) >> issue1
         fixes.size() == 1
     }
 
@@ -120,21 +122,21 @@ class VersionRecordTest extends Specification {
         GPIssue issue4 = newIssue(4, 'Making unnecessary calls', 'quality').pullRequest(true)
         GPIssue issue5 = newIssue(5, 'Making unnecessary calls', 'bug')
 
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
         addCommits(record, 5)
         gitRemote.isIssueFixWord('Fix') >> true
 
         when:
-        record.parse()
+        record.parse(issueRecords)
         Map<String, Set<GPIssue>> fixes = record.getFixesByGroup()
         Set<GPIssue> pullRequests = record.getPullRequests()
 
         then:
-        1 * gitRemote.getIssue(1) >> issue1
-        1 * gitRemote.getIssue(2) >> issue2
-        1 * gitRemote.getIssue(3) >> issue3
-        1 * gitRemote.getIssue(4) >> issue4
-        2 * gitRemote.getIssue(5) >> issue5 // deliberately added twice to ensure output not duplicated
+        1 * issueRecords.getIssue(gitPlus, 1) >> issue1
+        1 * issueRecords.getIssue(gitPlus, 2) >> issue2
+        1 * issueRecords.getIssue(gitPlus, 3) >> issue3
+        1 * issueRecords.getIssue(gitPlus, 4) >> issue4
+        2 * issueRecords.getIssue(gitPlus, 5) >> issue5 // deliberately added twice to ensure output not duplicated
         fixes.size() == 5
         assertThat(fixes.keySet()).containsExactly(DefaultChangeLogConfiguration.DEFAULT_PULL_REQUESTS_TITLE, 'Fixes', 'Quality', 'Tasks', 'Documentation')
         assertThat(pullRequests).containsOnly(issue4)
@@ -146,7 +148,7 @@ class VersionRecordTest extends Specification {
         Tag tag = newTag(tagName)
 
         when:
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
 
         then:
         !record.hasCommits()
@@ -163,11 +165,11 @@ class VersionRecordTest extends Specification {
         final String tagName = "0.1"
         Tag tag = newTag(tagName)
         changeLogConfiguration.exclusionTags(ImmutableSet.of("javadoc"))
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
         addCommitsOneWithExclusionTag(record)
 
         when:
-        record.parse()
+        record.parse(issueRecords)
 
         then:
         record.getCommits().size() == 1
@@ -188,11 +190,12 @@ class VersionRecordTest extends Specification {
         gitPlus2.local >> gitLocal
         Tag tag = newTag("0.1")
         changeLogConfiguration.correctTypos(true)
-        record = new VersionRecord(tag, changeLogConfiguration, gitPlus2)
+        record = new VersionRecord(tag, changeLogConfiguration, gitPlus2, fileLocator)
         record.addCommit(gitLocal.commits1.get(commitNo))
+        issueRecords = new DefaultIssueRecords()
 
         when:
-        List<GPIssue> fixReferences = record.parse()
+        List<GPIssue> fixReferences = record.parse(issueRecords)
 
         then:
         fixReferences.size() == issueNo.size()

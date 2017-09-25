@@ -14,5 +14,7 @@ public class ChangeLogModule extends AbstractModule {
         bind(ChangeLogConfiguration.class).to(DefaultChangeLogConfiguration.class);
         bind(ChangeLog.class).to(DefaultChangeLog.class);
         bind(VersionHistoryBuilder.class).to(DefaultVersionHistoryBuilder.class);
+        bind(IssueRecords.class).to(DefaultIssueRecords.class);
+        bind(FileLocator.class).to(DefaultFileLocator.class);
     }
 }

@@ -33,7 +33,9 @@ import java.io.StringWriter
 class DefaultChangeLog @Inject constructor(
         val gitPlus: GitPlus,
         override val configuration: ChangeLogConfiguration,
-        val versionHistoryBuilder: VersionHistoryBuilder)
+        val versionHistoryBuilder: VersionHistoryBuilder,
+        val issueRecords: IssueRecords,
+        val fileLocator: FileLocator)
 
     : ChangeLog, ChangeLogConfiguration by configuration {
 
@@ -57,15 +59,40 @@ class DefaultChangeLog @Inject constructor(
         return gitPlus
     }
 
+    private fun issueRecordFile(): File {
+        return fileLocator.locateIssueRecordsFile(configuration, gitPlus)
+    }
+
+    private fun saveIssueRecords() {
+        if (configuration.storeIssuesLocally) {
+            issueRecords.save(issueRecordFile())
+            // If using the wiki to hold the issue records we need to add the file to Git
+            if (configuration.outputTarget == OutputTarget.WIKI_ROOT) {
+                gitPlus.wikiLocal.add(issueRecordFile())
+            }
+        } else {
+            log.info("storing of issue records locally has been disabled [configuration.storeIssuesLocally], performance of future log generation may be affected")
+        }
+    }
+
+    private fun loadIssueRecords() {
+        if (configuration.useStoredIssues) {
+            issueRecords.load(issueRecordFile())
+        } else {
+            log.info("Loading of locally stored issue records is disabled [configuration.useStoredIssues], performance may be affected")
+        }
+    }
+
     override fun generate(): File {
         validate()
         prepareGitPlus()
+        loadIssueRecords()
         versionRecords.addAll(versionHistoryBuilder.build(gitPlus, configuration))
 
 
         versionRecords.forEach { vr ->
             try {
-                vr.parse()
+                vr.parse(issueRecords)
             } catch (e: IOException) {
                 log.error("Failed to parse a version record", e)
             }
@@ -89,6 +116,7 @@ class DefaultChangeLog @Inject constructor(
             wikiLocal.commit("Auto generated changelog")
             wikiLocal.push(false, false)
         }
+        saveIssueRecords()
         return outputFile
     }
 
@@ -111,21 +139,7 @@ class DefaultChangeLog @Inject constructor(
 
 
     override fun outputFile(): File {
-        val outputFile: File
-        when (outputTarget) {
-            OutputTarget.USE_FILE_SPEC -> outputFile = outputFileSpec
-            OutputTarget.PROJECT_ROOT -> outputFile = File(gitPlus.local.projectDir(), outputFilename)
-            OutputTarget.PROJECT_BUILD_ROOT -> {
-                val buildDir = File(gitPlus.local.projectDir(), "build")
-                outputFile = File(buildDir, outputFilename)
-            }
-            OutputTarget.WIKI_ROOT -> outputFile = File(gitPlus.wikiLocal.projectDir(), outputFilename)
-            OutputTarget.CURRENT_DIR -> {
-                val currentDir = File(".")
-                outputFile = File(currentDir, outputFilename)
-            }
-        }
-        return outputFile
+        return fileLocator.locateChangeLogFile(configuration, gitPlus)
     }
 
 

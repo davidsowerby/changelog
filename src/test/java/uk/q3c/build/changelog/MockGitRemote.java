@@ -144,7 +144,11 @@ public class MockGitRemote implements GitRemote {
     @NotNull
     @Override
     public GPIssue getIssue(String s, String s1, int i) {
-        return issues.get(18);
+        if (issues.containsKey(i)) {
+            return issues.get(i);
+        } else {
+            throw new GitRemoteException("Issue not found, issue: " + i);
+        }
     }
 
     @NotNull
@@ -255,7 +259,7 @@ public class MockGitRemote implements GitRemote {
     @NotNull
     @Override
     public String getRepoUser() {
-        return null;
+        return "davidsowerby";
     }
 
     @Override
@@ -263,10 +267,9 @@ public class MockGitRemote implements GitRemote {
 
     }
 
-    @NotNull
     @Override
     public String getRepoName() {
-        return null;
+        return "dummy";
     }
 
     @Override
@@ -274,7 +277,6 @@ public class MockGitRemote implements GitRemote {
 
     }
 
-    @NotNull
     @Override
     public Map<String, String> getIssueLabels() {
         return null;
@@ -295,7 +297,6 @@ public class MockGitRemote implements GitRemote {
 
     }
 
-    @NotNull
     @Override
     public String getConfirmDelete() {
         return null;

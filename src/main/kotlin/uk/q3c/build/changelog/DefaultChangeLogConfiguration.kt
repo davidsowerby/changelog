@@ -16,6 +16,11 @@ import java.io.File
 
 
 data class DefaultChangeLogConfiguration(override var projectName: String = notSpecified) : ChangeLogConfiguration {
+    override var version: Int = 1
+    override var useStoredIssues: Boolean = true
+    override var storeIssuesLocally: Boolean = true
+    override var issuesFilename: String = "issueRecords.md"
+
     @JsonIgnore
     @Transient
     private val log = LoggerFactory.getLogger(this.javaClass.name)
@@ -32,7 +37,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var outputTarget = OutputTarget.WIKI_ROOT
     @JsonIgnore
     @Transient
-    override var outputFileSpec: File = File(".", outputFilename)
+    override var outputDirectorySpec: File = File(".")
     override var fromCommitId = notSpecified
     override var toCommitId = notSpecified
     override var fromVersionId = notSpecified
@@ -64,7 +69,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
         this.outputFilename = other.outputFilename
         this.pullRequestTitle = other.pullRequestTitle
         this.outputTarget = other.outputTarget
-        this.outputFileSpec = other.outputFileSpec
+        this.outputDirectorySpec = other.outputDirectorySpec
         this.fromCommitId = other.fromCommitId
         this.toCommitId = other.toCommitId
         this.fromVersionId = other.fromVersionId
@@ -131,8 +136,8 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
         return this
     }
 
-    override fun outputFileSpec(outputFileSpec: File): ChangeLogConfiguration {
-        this.outputFileSpec = outputFileSpec
+    override fun outputDirectorySpec(outputDirectorySpec: File): ChangeLogConfiguration {
+        this.outputDirectorySpec = outputDirectorySpec
         return this
     }
 
@@ -234,6 +239,22 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
         this.projectDirParent = projectDirParent
         return this
     }
+
+    override fun useStoredIssues(useStoredIssues: Boolean): ChangeLogConfiguration {
+        this.useStoredIssues = useStoredIssues
+        return this
+    }
+
+    override fun storeIssuesLocally(storeIssuesLocally: Boolean): ChangeLogConfiguration {
+        this.storeIssuesLocally = storeIssuesLocally
+        return this
+    }
+
+    override fun issuesFilename(issuesFilename: String): ChangeLogConfiguration {
+        this.issuesFilename = issuesFilename
+        return this
+    }
+
 
     companion object {
 

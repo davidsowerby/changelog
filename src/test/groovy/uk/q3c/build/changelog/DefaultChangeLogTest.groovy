@@ -1,20 +1,16 @@
 package uk.q3c.build.changelog
 
-import org.eclipse.jgit.lib.PersonIdent
+import com.google.common.collect.ImmutableList
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.GitCommit
-import uk.q3c.build.gitplus.local.GitLocal
-import uk.q3c.build.gitplus.local.Tag
 import uk.q3c.build.gitplus.local.WikiLocal
-import uk.q3c.build.gitplus.remote.GPIssue
+import uk.q3c.build.gitplus.test.MocksKt
 
-import java.time.LocalDate
-import java.time.ZoneId
-
-import static uk.q3c.build.changelog.OutputTarget.*
+import static org.mockito.Mockito.*
 
 /**
  * Created by David Sowerby on 07 Mar 2016
@@ -25,38 +21,31 @@ class DefaultChangeLogTest extends Specification {
     TemporaryFolder temporaryFolder
     File temp
 
-    DefaultChangeLog changeLog
+    DefaultChangeLog changelog
     ChangeLogConfiguration changeLogConfiguration = new DefaultChangeLogConfiguration()
     GitPlus gitPlus = Mock(GitPlus)
-    GitLocal gitLocal = Mock(GitLocal)
-    WikiLocal wikiLocal = Mock(WikiLocal)
-    List<Tag> tags
-    List<GitCommit> commits
-    List<GPIssue> issues
-    List<Set<String>> labels
-    final String projectFolderName = 'project'
-    final String wikiFolderName = 'project.wiki'
-    static File projectFolder
-    static File wikiFolder
-    PersonIdent personIdent = Mock(PersonIdent)
-    VersionHistoryBuilder versionHistoryBuilder
+    WikiLocal wikiLocal = mock(WikiLocal)
 
+
+    final String projectName = 'project'
+
+    VersionHistoryBuilder versionHistoryBuilder
+    FileLocator fileLocator = new DefaultFileLocator()
+    IssueRecords issueRecords = Mock(IssueRecords)
+    ImmutableList<GitCommit> commits
 
     def setup() {
 
-        tags = new ArrayList<>()
         temp = temporaryFolder.getRoot()
-        gitPlus.local >> gitLocal
-        gitPlus.wikiLocal >> wikiLocal
-        projectFolder = new File(temp, projectFolderName)
-        wikiFolder = new File(temp, wikiFolderName)
-        gitLocal.projectDir() >> projectFolder
-        wikiLocal.projectDir() >> wikiFolder
-        personIdent.name >> "A Person"
-        LocalDate localDate = LocalDate.of(2016, 2, 3)
-        personIdent.when >> Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-        personIdent.timeZone >> TimeZone.default
-        versionHistoryBuilder = new DefaultVersionHistoryBuilder()
+
+        commits = ImmutableList.of()
+        gitPlus = MocksKt.mockGitPlusWithDataConfig()
+        when(gitPlus.wikiLocal).thenReturn(wikiLocal)
+        when(gitPlus.local.extractCommitsFor(new GitBranch("develop"))).thenReturn(commits)
+        changeLogConfiguration.projectName = projectName
+        changeLogConfiguration.remoteRepoUser = "davidsowerby"
+//        gitPlus.local.configuration.projectName=projectName
+        versionHistoryBuilder = new DefaultVersionHistoryBuilder(fileLocator)
 
     }
 
@@ -67,67 +56,41 @@ class DefaultChangeLogTest extends Specification {
         changeLogConfiguration = new DefaultChangeLogConfiguration()
 
         when:
-        DefaultChangeLog changelog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
+        changelog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder, issueRecords, fileLocator)
 
         then:
         changelog.getConfiguration() == changeLogConfiguration
     }
 
+    def "issue records, load and save defaults"() {
 
-    def "getOutputFile using FILE_SPEC"() {
-        given:
-        File fileSpec = new File(temp, 'changelog.md')
-        changeLogConfiguration.templateName('markdown.vm').outputTarget(USE_FILE_SPEC).outputFileSpec(fileSpec)
+        given: "defaults is to use stored issue records"
+        DefaultChangeLog changelog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder, issueRecords, fileLocator)
 
-        when:
-        changeLog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
+        when: "useStoredIssues is true"
+        changelog.generate()
 
         then:
-        changeLog.outputFile().equals(fileSpec)
+        1 * issueRecords.load(_)
+        1 * issueRecords.save(_)
     }
 
-    def "getOutputFile using PROJECT_ROOT"() {
-        given:
-        changeLogConfiguration.templateName('markdown.vm').outputTarget(PROJECT_ROOT).outputFilename('changelog.md')
-        changeLog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
+    def "do not load issue records when useStoredIssues false"() {
 
-        expect:
-        changeLog.outputFile().equals(new File(projectFolder, 'changelog.md'))
+        given: "defaults is to use and store issue records"
+        DefaultChangeLog changelog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder, issueRecords, fileLocator)
+        changeLogConfiguration.useStoredIssues = false
+        changeLogConfiguration.storeIssuesLocally = false
+
+        when: "useStoredIssues and storeIssuesLocally is false"
+        changelog.generate()
+
+        then:
+        0 * issueRecords.load(_)
+        0 * issueRecords.save(_)
+
+
     }
-
-    def "getOutputFile using PROJECT_BUILD_ROOT"() {
-        given:
-        changeLogConfiguration.templateName('markdown.vm').outputTarget(PROJECT_BUILD_ROOT).outputFilename('changelog.md')
-        changeLog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
-
-        File buildFolder = new File(projectFolder, 'build')
-
-        expect:
-        changeLog.outputFile().equals(new File(buildFolder, 'changelog.md'))
-    }
-
-    def "getOutputFile using WIKI_ROOT"() {
-        given:
-        changeLogConfiguration.templateName('markdown.vm').outputTarget(WIKI_ROOT).outputFilename('changelog.md')
-        changeLog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
-
-        expect:
-        changeLog.outputFile().equals(new File(wikiFolder, 'changelog.md'))
-    }
-
-    def "getOutputFile using CURRENT_DIR"() {
-        given:
-        changeLogConfiguration.templateName('markdown.vm').outputTarget(CURRENT_DIR).outputFilename('changelog.md')
-        changeLog = new DefaultChangeLog(gitPlus, changeLogConfiguration, versionHistoryBuilder)
-
-        File currentDir = new File('.')
-
-        expect:
-        changeLog.outputFile().equals(new File(currentDir, 'changelog.md'))
-    }
-
-
-
 
 
 }

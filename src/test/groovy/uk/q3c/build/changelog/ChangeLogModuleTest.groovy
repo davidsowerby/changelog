@@ -17,5 +17,8 @@ class ChangeLogModuleTest extends Specification {
         injector.getInstance(ChangeLog.class) instanceof DefaultChangeLog
         injector.getInstance(ChangeLogConfiguration.class) instanceof DefaultChangeLogConfiguration
         injector.getInstance(VersionHistoryBuilder.class) instanceof DefaultVersionHistoryBuilder
+        injector.getInstance(FileLocator.class) instanceof DefaultFileLocator
+        injector.getInstance(IssueRecords.class) instanceof DefaultIssueRecords
+
     }
 }

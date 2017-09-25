@@ -15,6 +15,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
     GitPlus gitPlus = Mock(GitPlus)
     GitRemote gitRemote = Mock(GitRemote)
     MockGitLocal gitLocal
+    FileLocator fileLocator = new DefaultFileLocator()
 
     def setup() {
         versionTagFilter.isVersionTag(_) >> true
@@ -22,7 +23,7 @@ class DefaultVersionHistoryBuilderTest extends Specification {
         gitLocal = new MockGitLocal()
         gitPlus.local >> gitLocal
         gitPlus.remote >> gitRemote
-        builder = new DefaultVersionHistoryBuilder()
+        builder = new DefaultVersionHistoryBuilder(fileLocator)
     }
 
     def "maxVersions set, no versions exist, throw exception"() {

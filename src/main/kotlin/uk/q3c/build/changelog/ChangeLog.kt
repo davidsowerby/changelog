@@ -14,10 +14,10 @@ interface ChangeLog : ChangeLogConfiguration {
     val configuration: ChangeLogConfiguration
 
     /**
-     * A combination of [outputFilename] and [outputTarget], unless USE_FILE_SPEC is selected, in which case the [outputFileSpec] must
+     * A combination of [outputFilename] and [outputTarget], unless USE_DIRECTORY_SPEC is selected, in which case the [outputDirectorySpec] must
      * be given
      *
-     * @throws UninitializedPropertyAccessException if [outputTarget] is [OutputTarget.USE_FILE_SPEC], but [outputFileSpec]
+     * @throws UninitializedPropertyAccessException if [outputTarget] is [OutputTarget.USE_DIRECTORY_SPEC], but [outputDirectorySpec]
      * has not been set
      */
     fun outputFile(): File

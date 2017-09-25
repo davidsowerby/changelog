@@ -111,13 +111,16 @@ Default value for this property is `DefaultChangeLogConfiguration.defaultLabelGr
 When true, show the full commit message in a detail section.  Also requires that the Velocity template uses this
 property (the default template does)
 
-## Output destination properties
+## Output destination and control properties
 
 | name                  | purpose                                                                              | default                   |
 |-----------------------|--------------------------------------------------------------------------------------|---------------------------|
 | outputFilename        |  The file name to use for the change log output.  Used with [outputTarget]           | "changelog.md"            |
-| outputFileSpec        |  File to be used as output, when [outputTarget] is [OutputTarget.USE_FILE_SPEC]      | null                      |
+| outputDirectorySpec        |  Directory to be used as output, when [outputTarget] is [OutputTarget.USE_DIRECTORY_SPEC]      | File(".")  |
 | outputTarget        |  The output directory for the generated change log.  Used with [outputFilename]        | [OutputTarget.WIKI_ROOT]  |
+| useStoredIssues     | use issue records stored from previous run, if present|  true |
+| storeIssuesLocally  | store issues so that future run does not need to access remote API so much|  true|
+| issuesFilename      | File name to use for locally stored issues| "issueRecords.md"|
 
 
 <a name="outputFilename"></a>
@@ -129,7 +132,7 @@ The file name to use for the change log output.  Used in conjunction with [outpu
 
 The output directory for the generated change log.  Used in conjunction with [outputFilename](#outputFilename).  Default is [OutputTarget.WIKI_ROOT].  By default therefore, a file named "changelog.md" is output to the root of the wiki directory
 
-### outputFileSpec
+### outputDirectorySpec
 
 Required only when [outputTarget](#outputTarget) is [OutputTarget.USE_FILE_SPEC].  This property then points to the file which is to be used as output.  Default is null
 

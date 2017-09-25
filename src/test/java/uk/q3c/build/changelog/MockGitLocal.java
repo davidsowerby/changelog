@@ -478,4 +478,9 @@ public class MockGitLocal implements GitLocal {
     public void setVersion(int i) {
 
     }
+
+    @Override
+    public void checkoutCommitNoMerge(GitSHA gitSHA, String s) {
+
+    }
 }

@@ -10,7 +10,7 @@ import uk.q3c.build.gitplus.local.Tag
 /**
  * Created by David Sowerby on 18 Nov 2016
  */
-class DefaultVersionHistoryBuilder @Inject constructor() : VersionHistoryBuilder {
+class DefaultVersionHistoryBuilder @Inject constructor(val fileLocator: FileLocator) : VersionHistoryBuilder {
     private val log = LoggerFactory.getLogger(this.javaClass.name)
     // maps commit hash to tag
     val tagMap: MutableMap<String, Tag> = mutableMapOf()
@@ -101,7 +101,7 @@ class DefaultVersionHistoryBuilder @Inject constructor() : VersionHistoryBuilder
      */
     private fun addNewVersion(gCommit: GitCommit): VersionRecord {
         val tag: Tag = tagMap.get(gCommit.hash)!!
-        val versionRecord = VersionRecord(tag, changeLogConfiguration, gitPlus)
+        val versionRecord = VersionRecord(tag, changeLogConfiguration, gitPlus, fileLocator)
         versionRecord.addCommit(gCommit)
         commitsProcessed++
         lastProcessedCommit = gCommit

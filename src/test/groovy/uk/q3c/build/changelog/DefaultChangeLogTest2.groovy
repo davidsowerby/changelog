@@ -11,7 +11,7 @@ import uk.q3c.util.testutil.FileTestUtil
 
 import java.nio.file.Paths
 
-import static uk.q3c.build.changelog.OutputTarget.PROJECT_ROOT
+import static uk.q3c.build.changelog.OutputTarget.*
 
 /**
  * Tests for correct extraction of Git commit comments, and any issue references within them
@@ -30,6 +30,8 @@ class DefaultChangeLogTest2 extends Specification {
     WikiLocal wikiLocal = Mock(WikiLocal)
     MockGitRemote mockRemote = new MockGitRemote()
     VersionHistoryBuilder historyBuilder
+    IssueRecords issueRecords = new DefaultIssueRecords()
+    FileLocator fileLocator = new DefaultFileLocator()
 
     def setup() {
         temp = temporaryFolder.getRoot()
@@ -40,8 +42,8 @@ class DefaultChangeLogTest2 extends Specification {
         gitPlus.wikiLocal >> wikiLocal
         mockRemote.createIssues(1)
         configuration = new DefaultChangeLogConfiguration()
-        historyBuilder = new DefaultVersionHistoryBuilder()
-        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        historyBuilder = new DefaultVersionHistoryBuilder(fileLocator)
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder, issueRecords, fileLocator)
         configuration.projectName = "dummy"
         configuration.remoteRepoUser = "davidsowerby"
     }
@@ -56,7 +58,7 @@ class DefaultChangeLogTest2 extends Specification {
         gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
         gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
         configuration.outputTarget(PROJECT_ROOT).correctTypos(true).projectDirParent(temp)
-        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder, issueRecords, fileLocator)
         String expected = 'changelog.md'
         File expectedResult = testResource(expected)
 
@@ -77,7 +79,7 @@ class DefaultChangeLogTest2 extends Specification {
         gitLocal.createVersionTag('0.0.3.1', 7, 'prep')
         gitLocal.createVersionTag('0.0.2.1', 9, 'prep')
         configuration.outputTarget(PROJECT_ROOT).correctTypos(false).showDetail(false).projectDirParent(temp)
-        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder)
+        changeLog = new DefaultChangeLog(gitPlus, configuration, historyBuilder, issueRecords, fileLocator)
         String expected = 'changelog2.md'
         File expectedResult = testResource(expected)
 

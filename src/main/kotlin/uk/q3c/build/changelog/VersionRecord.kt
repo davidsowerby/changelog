@@ -15,7 +15,7 @@ import java.util.*
 /**
  * Created by David Sowerby on 07 Mar 2016
  */
-class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfiguration, val gitPlus: GitPlus) {
+class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfiguration, val gitPlus: GitPlus, val fileLocator: FileLocator) {
     private val log = LoggerFactory.getLogger(this.javaClass.name)
     val commits: MutableList<GitCommit>
     val excludedCommits: MutableList<GitCommit>
@@ -47,7 +47,6 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         } else {
             tag.tagName
         }
-
 
 
     val releaseDate: ZonedDateTime
@@ -110,12 +109,12 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
 
      * @return the issues referenced by all the commit comments
      */
-    fun parse(): List<GPIssue> {
+    fun parse(issueRecords: IssueRecords): List<GPIssue> {
         val fixReferences: MutableList<GPIssue> = mutableListOf()
         expandedCommits.clear()
         for (c in commits) {
             if (!excludedFromChangeLog(c, changeLogConfiguration)) {
-                val expandedCommitMessage = extractIssueReferences(c, fixReferences)
+                val expandedCommitMessage = extractIssueReferences(c, fixReferences, issueRecords)
                 val expandedCommit = ExpandedGitCommit(c, expandedCommitMessage, extractShortMessage(expandedCommitMessage))
                 expandedCommits.add(expandedCommit)
                 for (issue in fixReferences) {
@@ -131,6 +130,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         removeEmptyGroups()
         return fixReferences
     }
+
 
     private fun extractShortMessage(fullMessage: String): String {
         return fullMessage.split("\n").get(0)
@@ -152,7 +152,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         return false
     }
 
-    fun extractIssueReferences(commit: GitCommit, fixReferences: MutableList<GPIssue>): String {
+    fun extractIssueReferences(commit: GitCommit, fixReferences: MutableList<GPIssue>, issueRecords: IssueRecords): String {
         var fullMessage = correctCommonTypos(commit.fullMessage)
 
         val tokenizer = StrTokenizer(fullMessage, StrMatcher.charSetMatcher(TOKEN_SPLIT_CHARS))
@@ -163,7 +163,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         for (token in tokens) {
             previousToken = currentToken
             currentToken = token
-            val expandedReference = expandIssueReferences(previousToken, currentToken, fixReferences)
+            val expandedReference = expandIssueReferences(previousToken, currentToken, fixReferences, issueRecords)
             expandedTokens.add(expandedReference)
         }
         val tokensIterator = tokens.iterator()
@@ -179,7 +179,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
         return fullMessage
     }
 
-    private fun expandIssueReferences(previousToken: String, currentToken: String, fixReferences: MutableList<GPIssue>): String {
+    private fun expandIssueReferences(previousToken: String, currentToken: String, fixReferences: MutableList<GPIssue>, issueRecords: IssueRecords): String {
         if (!currentToken.contains("#") || currentToken.length < 2) {
             return currentToken
         }
@@ -199,7 +199,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
             return currentToken
         }
 
-        return captureFixesAndExpandReference(fullRepoName, issueNumber, previousToken, currentToken, fixReferences)
+        return captureFixesAndExpandReference(fullRepoName, issueNumber, previousToken, currentToken, fixReferences, issueRecords)
 
     }
 
@@ -210,14 +210,14 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
      *
      * This method may need to move to [GitRemote] - other providers may use a different syntax to GitHub
      */
-    private fun captureFixesAndExpandReference(fullRepoName: String, issueNumber: Int, previousToken: String, currentToken: String, fixReferences: MutableList<GPIssue>): String {
+    private fun captureFixesAndExpandReference(fullRepoName: String, issueNumber: Int, previousToken: String, currentToken: String, fixReferences: MutableList<GPIssue>, issueRecords: IssueRecords): String {
         val gpIssue: GPIssue
         try {
             if (fullRepoName.isEmpty()) {
-                gpIssue = gitPlus.remote.getIssue(issueNumber)
+                gpIssue = issueRecords.getIssue(gitPlus, issueNumber)
             } else {
                 val splitRepoName = fullRepoName.split("/".toRegex()).dropLastWhile(String::isEmpty).toTypedArray()
-                gpIssue = gitPlus.remote.getIssue(splitRepoName[0], splitRepoName[1], issueNumber)
+                gpIssue = issueRecords.getIssue(gitPlus, splitRepoName[0], splitRepoName[1], issueNumber)
             }
 
             if (gitPlus.remote.isIssueFixWord(previousToken)) {

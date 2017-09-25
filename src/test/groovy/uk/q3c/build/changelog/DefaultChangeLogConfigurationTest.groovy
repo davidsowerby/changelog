@@ -65,7 +65,10 @@ class DefaultChangeLogConfigurationTest extends Specification {
         // Output destination
         config.outputFilename == 'changelog.md'
         config.outputTarget == OutputTarget.WIKI_ROOT
-        config.outputFileSpec == new File(".", 'changelog.md')
+        config.outputDirectorySpec == new File(".")
+        config.useStoredIssues
+        config.storeIssuesLocally
+        config.issuesFilename == "issueRecords.md"
 
         //commit control
         config.typoMap == DefaultChangeLogConfiguration.defaultTypoMap
@@ -93,7 +96,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         int nCommits = 3
         String filename = "any"
         OutputTarget target = OutputTarget.PROJECT_BUILD_ROOT
-        File outputFileSpec = new File("/user/home/wiggly")
+        File outputDirSpec = new File("/user/home/wiggly")
         Map<String, String> typoMap = ImmutableMap.of()
         Set<String> exclusionTags = ImmutableSet.of()
         String pullRequestTitle = "rrrrrrrrr"
@@ -109,6 +112,9 @@ class DefaultChangeLogConfigurationTest extends Specification {
                 .fromCommitId(fromCommit)
                 .toCommitId(toCommit)
                 .branch(branch)
+                .useStoredIssues(false)
+                .storeIssuesLocally(false)
+                .issuesFilename("other")
                 .maxVersions(nVersions)
                 .maxCommits(nCommits)
                 .separatePullRequests(false)
@@ -117,13 +123,14 @@ class DefaultChangeLogConfigurationTest extends Specification {
                 .labelGroups(labelGroups)
                 .outputFilename(filename)
                 .outputTarget(OutputTarget.PROJECT_BUILD_ROOT)
-                .outputFileSpec(outputFileSpec)
+                .outputDirectorySpec(outputDirSpec)
                 .exclusionTags(exclusionTags)
                 .typoMap(typoMap)
                 .correctTypos(true)
                 .versionTagFilter(tagFilter)
                 .autoTagLatestCommit(false)
                 .currentBuildTagName(currentBuildTag)
+
 
         then:
         // Version or commit range properties - see interface javadoc for order of priorities.
@@ -140,13 +147,16 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.labelGroups == labelGroups
         config.outputFilename == filename
         config.outputTarget == OutputTarget.PROJECT_BUILD_ROOT
-        config.outputFileSpec == outputFileSpec
+        config.outputDirectorySpec == outputDirSpec
         config.typoMap == typoMap
         config.correctTypos
         config.versionTagFilter == tagFilter
         !config.autoTagLatestCommit
         config.exclusionTags == exclusionTags
         config.currentBuildTagName == currentBuildTag
+        config.issuesFilename == "other"
+        !config.useStoredIssues
+        !config.storeIssuesLocally
     }
 
     def "versions or commits"() {
