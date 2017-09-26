@@ -29,17 +29,6 @@ kaytee {
     }
     unitTest{
         qualityGate = true
-        thresholds{
-             instruction = 100
-             branch = 100
-             line = 100
-             complexity = 100
-             method = 100
-             clazz = 100
-        }
-    }
-    functionalTest{
-        enabled=true
     }
 }
 
@@ -55,7 +44,7 @@ repositories {
 
 dependencies {
     //Git
-    compile 'uk.q3c.build:gitplus:0.33.0.0'
+    compile 'uk.q3c.build:gitplus:0.33.1.0'
     //guice
     compile 'com.google.inject:guice:4.1.0'
 

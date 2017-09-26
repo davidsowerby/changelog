@@ -1,5 +1,6 @@
 package uk.q3c.build.changelog
 
+import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import uk.q3c.build.gitplus.gitplus.GitPlus
@@ -46,8 +47,9 @@ interface IssueRecords {
 
 
 class DefaultIssueRecords : IssueRecords {
+    private val issueMap: MutableMap<String, GPIssue> = mutableMapOf()
     private val log = LoggerFactory.getLogger(this.javaClass.name)
-    private var issueMap: MutableMap<String, GPIssue> = mutableMapOf()
+
 
     override fun getIssue(gitPlus: GitPlus, number: Int): GPIssue {
         return getIssue(gitPlus, gitPlus.remote.repoUser, gitPlus.remote.repoName, number)
@@ -58,14 +60,16 @@ class DefaultIssueRecords : IssueRecords {
         val repoDescriptor = RepoDescriptor("https://${gitPlus.remote.providerBaseUrl}", repoUser, repoName)
         val issueDescriptor = IssueDescriptor(repoDescriptor, number)
         val issueUrl = issueDescriptor.toUrl()
-        return if (issueMap.containsKey(issueUrl)) {
-            log.debug("returning cached version of issue $issueUrl")
-            issueMap[issueUrl]!!
-        } else {
+        val gpIssue: GPIssue? = issueMap[issueUrl]
+        if (gpIssue == null) {
             log.debug("no cached version of issue $issueUrl found, retrieving from remote API")
-            val gpIssue: GPIssue = gitPlus.remote.getIssue(repoUser, repoName, number)
-            issueMap.put(gpIssue.htmlUrl, gpIssue)
-            gpIssue
+            val gpi: GPIssue = gitPlus.remote.getIssue(repoUser, repoName, number)
+            issueMap.put(gpi.htmlUrl, gpi)
+            return gpi
+        } else {
+            log.debug("returning cached version of issue $issueUrl")
+            return gpIssue
+
         }
     }
 
@@ -79,8 +83,12 @@ class DefaultIssueRecords : IssueRecords {
             log.info("loading locally store issue records file from {}, only additional issue data will be retrieved from the remote API", file)
             val mapper = ObjectMapper()
             val fis = FileInputStream(file)
+
             fis.use {
-                issueMap = mapper.readValue(fis, issueMap::class.java)
+                val loaded: Map<String, GPIssue> = mapper.readValue(fis, object : TypeReference<Map<String, GPIssue>>() {
+                })
+                issueMap.clear()
+                issueMap.putAll(loaded)
             }
         } else {
             log.info("no issue records file found at {}, all issue data will be retrieved from the remote API", file)

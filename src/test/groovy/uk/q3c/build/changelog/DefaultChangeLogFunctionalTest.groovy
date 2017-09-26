@@ -7,11 +7,9 @@ import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import uk.q3c.build.gitplus.GitPlusFactory
 import uk.q3c.build.gitplus.gitplus.GitPlus
-import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.util.testutil.FileTestUtil
 
 import java.util.concurrent.TimeUnit
-
 /**
  * Created by David Sowerby on 07 Mar 2016
  */
@@ -26,7 +24,7 @@ class DefaultChangeLogFunctionalTest extends Specification {
     GitPlus gitPlus
 
 
-    final String projectName = 'q3c-testutils'
+    final String projectName = 'changelog'
     final String userName = 'davidsowerby'
     File logFile1
     File logFile2
@@ -48,7 +46,6 @@ class DefaultChangeLogFunctionalTest extends Specification {
     def "generate without issue load, then with and show difference"() {
         given:
         gitPlus.execute()
-        gitPlus.local.checkoutRemoteBranch(new GitBranch("develop"))
 
         long time1
         long time2
@@ -57,7 +54,8 @@ class DefaultChangeLogFunctionalTest extends Specification {
 
 
 
-        when: "generated to wiki with no stored issues (this is a fresh clone)"
+        when: "generated to wiki with no stored issues"
+        changelog.configuration.useStoredIssues = false
         stopWatch.start()
         logFile1 = changelog.generate()
         stopWatch.stop()
@@ -69,6 +67,7 @@ class DefaultChangeLogFunctionalTest extends Specification {
 
         when: "locally stored issues used"
         stopWatch.reset()
+        changelog.configuration.useStoredIssues = true
         stopWatch.start()
         logFile1 = changelog.generate()
         stopWatch.stop()
@@ -89,20 +88,4 @@ class DefaultChangeLogFunctionalTest extends Specification {
     }
 
 
-    def "stopwatch"() {
-        given:
-        StopWatch stopWatch = new StopWatch()
-
-        when:
-        stopWatch.start()
-        Thread.sleep(1502)
-
-        stopWatch.stop()
-
-        then:
-        println stopWatch.toString()
-        println stopWatch.getTime(TimeUnit.MILLISECONDS)
-
-
-    }
 }
