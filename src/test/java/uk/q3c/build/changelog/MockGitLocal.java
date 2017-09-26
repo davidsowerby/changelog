@@ -37,6 +37,7 @@ import java.util.List;
  */
 @SuppressWarnings("HardcodedFileSeparator")
 public class MockGitLocal implements GitLocal {
+    String currentBranch = "develop";
     List<GitCommit> commits1 = new ArrayList<>();
     List<Tag> tags = new ArrayList<>();
     ZonedDateTime commitDate = ZonedDateTime.of(LocalDateTime.of(2010, 11, 11, 12, 2), ZoneId.of("Z"));
@@ -152,13 +153,13 @@ public class MockGitLocal implements GitLocal {
     @NotNull
     @Override
     public List<String> branches() {
-        return null;
+        return ImmutableList.of("master", "develop");
     }
 
     @NotNull
     @Override
     public GitBranch currentBranch() {
-        return null;
+        return new GitBranch(currentBranch);
     }
 
     @NotNull

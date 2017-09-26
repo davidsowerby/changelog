@@ -43,7 +43,7 @@ class VersionRecord(val tag: Tag, val changeLogConfiguration: ChangeLogConfigura
 
     val tagRef: String
         get() = if (tag is CurrentBuildTag) {
-            changeLogConfiguration.branch.name
+            changeLogConfiguration.branch
         } else {
             tag.tagName
         }

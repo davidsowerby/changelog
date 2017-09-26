@@ -9,7 +9,7 @@ This section are all mandatory values - all others are optional
 
 | name                  | purpose                                                                              | default                   |
 |-----------------------|--------------------------------------------------------------------------------------|---------------------------|
-| branch                | The branch to take commits / versions from                                           | "develop"                 |
+| branch                | The branch to take commits / versions from                                           | "" (current branch)       |
 | projectName           | name of the project, used to identify the local and remote project repo              | "not specified"           |
 | remoteRepUser         | name of the remote repo user                                                         | "not specified"           |
 | projectDirParent      | File object pointing to parent directory of project                                  |  null                     |

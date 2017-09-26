@@ -10,7 +10,7 @@ import com.google.inject.Injector;
 public final class ChangeLogFactory {
 
     private ChangeLogFactory() {
-        // static only
+        throw new UnsupportedOperationException("use ChangeLogFactory.instance");
     }
 
     public static ChangeLog getInstance() {

@@ -1,6 +1,5 @@
 package uk.q3c.build.changelog
 
-import uk.q3c.build.gitplus.local.GitBranch
 import java.io.File
 
 /**
@@ -98,7 +97,7 @@ interface ChangeLogConfiguration {
     /**
      * The branch to take commits / versions from
      */
-    var branch: GitBranch
+    var branch: String
 
     /**
      * Used only when [processingAsVersions] is true.  Limits the number of versions produced.  Default is 50
@@ -263,7 +262,7 @@ interface ChangeLogConfiguration {
 
     fun outputDirectorySpec(outputDirectorySpec: File): ChangeLogConfiguration
 
-    fun branch(branch: GitBranch): ChangeLogConfiguration
+    fun branch(branch: String): ChangeLogConfiguration
 
     fun maxVersions(numberOfVersions: Int): ChangeLogConfiguration
 

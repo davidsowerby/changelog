@@ -1,11 +1,13 @@
 package uk.q3c.build.changelog
 
+import com.google.common.collect.ImmutableList
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.WikiLocal
 import uk.q3c.util.testutil.FileTestUtil
 
@@ -40,6 +42,8 @@ class DefaultChangeLogTest2 extends Specification {
         gitPlus.local >> gitLocal
         gitPlus.remote >> mockRemote
         gitPlus.wikiLocal >> wikiLocal
+        gitLocal.currentBranch() >> new GitBranch("develop")
+        gitLocal.branches() >> ImmutableList.of('master', 'develop')
         mockRemote.createIssues(1)
         configuration = new DefaultChangeLogConfiguration()
         historyBuilder = new DefaultVersionHistoryBuilder(fileLocator)
@@ -71,6 +75,7 @@ class DefaultChangeLogTest2 extends Specification {
 
     def "no typo correction, latest build not versioned, detail suppressed"() {
         given:
+        gitLocal.currentBranch = "master"
         gitLocal.projectName("Dummy")
         gitLocal.createVersionTag('2.0', 1, 'version 2.0')
         gitLocal.createVersionTag('1.1.0.1', 2, 'version 1.1.0.1')
@@ -88,7 +93,7 @@ class DefaultChangeLogTest2 extends Specification {
 
         then:
         !FileTestUtil.compare(changeLog.outputFile(), expectedResult, 4).isPresent() //cannot compare line 4, date changes
-        FileUtils.readLines(changeLog.outputFile()).get(4).startsWith('# [current build](https://github.com/davidsowerby/dummy/tree/develop)')
+        FileUtils.readLines(changeLog.outputFile()).get(4).startsWith('# [current build](https://github.com/davidsowerby/dummy/tree/)')
     }
 
 

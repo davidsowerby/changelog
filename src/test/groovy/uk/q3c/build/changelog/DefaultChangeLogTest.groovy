@@ -42,6 +42,8 @@ class DefaultChangeLogTest extends Specification {
         gitPlus = MocksKt.mockGitPlusWithDataConfig()
         when(gitPlus.wikiLocal).thenReturn(wikiLocal)
         when(gitPlus.local.extractCommitsFor(new GitBranch("develop"))).thenReturn(commits)
+        when(gitPlus.local.currentBranch()).thenReturn(new GitBranch("develop"))
+        when(gitPlus.local.branches()).thenReturn(ImmutableList.of('master', 'develop'))
         changeLogConfiguration.projectName = projectName
         changeLogConfiguration.remoteRepoUser = "davidsowerby"
 //        gitPlus.local.configuration.projectName=projectName

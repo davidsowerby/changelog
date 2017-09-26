@@ -4,6 +4,7 @@ import com.google.common.collect.UnmodifiableListIterator
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.local.GitCommit
 import uk.q3c.build.gitplus.local.Tag
 
@@ -24,7 +25,16 @@ class DefaultVersionHistoryBuilder @Inject constructor(val fileLocator: FileLoca
     private lateinit var commitIterator: UnmodifiableListIterator<GitCommit>
 
     override fun build(gitPlus: GitPlus, changeLogConfiguration: ChangeLogConfiguration): List<VersionRecord> {
-        val commits = gitPlus.local.extractCommitsFor(changeLogConfiguration.branch)
+        val branch = if (changeLogConfiguration.branch.isEmpty()) {
+            gitPlus.local.currentBranch()
+        } else {
+            GitBranch(changeLogConfiguration.branch)
+        }
+        if (!gitPlus.local.branches().contains(branch.name)) {
+            gitPlus.local.checkoutRemoteBranch(branch)
+        }
+
+        val commits = gitPlus.local.extractCommitsFor(branch)
         this.changeLogConfiguration = changeLogConfiguration
         this.gitPlus = gitPlus
         versionRecords.clear()

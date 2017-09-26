@@ -51,7 +51,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         config.toVersionId == notSpecified
         config.fromCommitId == notSpecified
         config.toCommitId == notSpecified
-        config.branch == new GitBranch("develop")
+        config.branch == ""
         config.maxVersions == 50
         config.maxCommits == 1000
         config.autoTagLatestCommit
@@ -91,7 +91,7 @@ class DefaultChangeLogConfigurationTest extends Specification {
         String toId = "toId"
         String fromCommit = "ffg"
         String toCommit = "fsfg"
-        GitBranch branch = new GitBranch("master")
+        String branch = "master"
         int nVersions = 8
         int nCommits = 3
         String filename = "any"

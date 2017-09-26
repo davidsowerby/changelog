@@ -1,8 +1,13 @@
 package uk.q3c.build.changelog
 
+import com.google.common.collect.ImmutableList
 import spock.lang.Specification
 import uk.q3c.build.gitplus.gitplus.GitPlus
+import uk.q3c.build.gitplus.local.GitBranch
 import uk.q3c.build.gitplus.remote.GitRemote
+import uk.q3c.build.gitplus.test.MocksKt
+
+import static org.mockito.Mockito.*
 
 /**
  * Created by David Sowerby on 20 Nov 2016
@@ -267,5 +272,52 @@ class DefaultVersionHistoryBuilderTest extends Specification {
 
         then:
         versions.size() == 0
+    }
+
+    def "config set to current branch, read commits without changing branch"() {
+        given:
+        gitPlus = MocksKt.mockGitPlusWithDataConfig()
+        when(gitPlus.local.currentBranch()).thenReturn(new GitBranch("develop"))
+        when(gitPlus.local.branches()).thenReturn(ImmutableList.of("master", "develop"))
+        when(gitPlus.local.extractCommitsFor(new GitBranch("develop"))).thenReturn(ImmutableList.of())
+
+        when:
+        builder.build(gitPlus, changeLogConfiguration)
+
+        then:
+        verify(gitPlus.local, never()).checkoutRemoteBranch(new GitBranch("develop")) == null
+        verify(gitPlus.local).extractCommitsFor(new GitBranch("develop")) == null
+    }
+
+    def "current branch not the same as config, branch exists, just retrieve its commits"() {
+        given:
+        changeLogConfiguration.branch = "develop"
+        gitPlus = MocksKt.mockGitPlusWithDataConfig()
+        when(gitPlus.local.currentBranch()).thenReturn(new GitBranch("kaytee"))
+        when(gitPlus.local.branches()).thenReturn(ImmutableList.of("master", "develop", "kaytee"))
+        when(gitPlus.local.extractCommitsFor(new GitBranch("develop"))).thenReturn(ImmutableList.of())
+
+        when:
+        builder.build(gitPlus, changeLogConfiguration)
+
+        then:
+        verify(gitPlus.local, never()).checkoutRemoteBranch(new GitBranch("develop")) == null
+        verify(gitPlus.local).extractCommitsFor(new GitBranch("develop")) == null
+    }
+
+    def "current branch not the same as config, branch does not exists, checkout remote branch and retrieve its commits"() {
+        given:
+        changeLogConfiguration.branch = "develop"
+        gitPlus = MocksKt.mockGitPlusWithDataConfig()
+        when(gitPlus.local.currentBranch()).thenReturn(new GitBranch("kaytee"))
+        when(gitPlus.local.branches()).thenReturn(ImmutableList.of("master", "kaytee"))
+        when(gitPlus.local.extractCommitsFor(new GitBranch("develop"))).thenReturn(ImmutableList.of())
+
+        when:
+        builder.build(gitPlus, changeLogConfiguration)
+
+        then:
+        verify(gitPlus.local).checkoutRemoteBranch(new GitBranch("develop")) == null
+        verify(gitPlus.local).extractCommitsFor(new GitBranch("develop")) == null
     }
 }

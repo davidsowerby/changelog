@@ -11,4 +11,12 @@ class ChangeLogFactoryTest extends Specification {
         expect:
         ChangeLogFactory.getInstance() instanceof DefaultChangeLog
     }
+
+    def "private constructor"() {
+        when:
+        new ChangeLogFactory()
+
+        then:
+        thrown UnsupportedOperationException
+    }
 }

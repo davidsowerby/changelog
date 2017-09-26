@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import org.slf4j.LoggerFactory
-import uk.q3c.build.gitplus.local.GitBranch
 import java.io.File
 
 /**
@@ -42,7 +41,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
     override var toCommitId = notSpecified
     override var fromVersionId = notSpecified
     override var toVersionId = notSpecified
-    override var branch: GitBranch = GitBranch("develop")
+    override var branch = ""
     override var autoTagLatestCommit = true
     override var maxCommits: Int = 1000
     override var maxVersions: Int = 50
@@ -196,7 +195,7 @@ data class DefaultChangeLogConfiguration(override var projectName: String = notS
         return this
     }
 
-    override fun branch(branch: GitBranch): ChangeLogConfiguration {
+    override fun branch(branch: String): ChangeLogConfiguration {
         this.branch = branch
         return this
     }
