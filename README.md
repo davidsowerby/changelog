@@ -1,5 +1,7 @@
 # ChangeLog 
 
+**This project has moved to [GitLab](https://gitlab.com/dsowerby/changelog)**
+
 ChangeLog uses Git commit comments and tags from a local repository, combined with issue information from an associated remote repository, to build a change log.
 
 Parameters are highly configurable, and a [Velocity](https://velocity.apache.org/) template is used to generate the output, enabling the user to modify presentation however they wish.
